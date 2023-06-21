@@ -1,0 +1,5 @@
+int8 grip
+int64 speed
+char cmd
+---
+bool status

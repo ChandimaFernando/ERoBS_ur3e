@@ -1,0 +1,7 @@
+cpp_arm_moveit:
+  ros__parameters:
+    box_dims: [2.0, 2.0, 01] # x, y, z
+    box_pos: [0, 0, 0, -0.01] # w, x, y, z
+    curve_extension_xy: 0.4  # midpointss in Bezeier Curvers
+    curve_extension_z: 0.35
+    curve_step_size: 0.01 
