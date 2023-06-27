@@ -11,8 +11,8 @@ repositories:
   moveit_resources:
     type: git
     url: https://github.com/ros-planning/moveit_resources
-    version: 0.1.0
-#    version: 5cf047b89b94340767dddd67962611fe987b484d
+#    version: 0.1.0
+    version: 5cf047b89b94340767dddd67962611fe987b484d
   moveit_task_constructor:
     type: git
     url: https://github.com/ros-planning/moveit_task_constructor.git
