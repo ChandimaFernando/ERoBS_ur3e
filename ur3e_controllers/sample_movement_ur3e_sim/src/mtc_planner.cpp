@@ -82,6 +82,7 @@ void MTCPlanner::task_executor(){
 
 }
 
+/*
 void MTCPlanner::test_pick(std::string obj_to_pick)
 {
 
@@ -119,7 +120,7 @@ void MTCPlanner::test_pick(std::string obj_to_pick)
     RCLCPP_INFO(LOGGER, "MTCPlanner::arm_top_approach_dists.pose.position.z : %f ", MTCPlanner::arm_top_approach_dists.pose.position.z  );  
 
 
-}
+}*/
 
 void MTCPlanner::grab_from_top(std::string obj_to_pick)
 {
@@ -127,7 +128,7 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick)
     std::chrono::nanoseconds sleep_time = 3000ms ;
     rclcpp::sleep_for(sleep_time);
     // for (int i = static_cast<int>(pick_overarm::OVERARM_HOME) ; i <= static_cast<int>(pick_overarm::OVERARM_RETURNED) ; i++)
-    for (int i = 0 ; i <= 1 ; i++)
+    for (int i = 0 ; i <= 3 ; i++)
     {
         // pick_overarm pick_overarm_enum_value = pick_overarm::OVERARM_PICK ;
         pick_overarm pick_overarm_enum_value = static_cast<pick_overarm>(i);
@@ -165,10 +166,8 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick)
         set_joint_goal("TOP PRE PLCE", top_pre_pick_angles);
         task_executor();
         top_approach("TOP APPROACH PLACE", "target");
-        task_executor();
         // Open the gripper here
         top_retreat("TOP RETREAT");
-        task_executor();
 
         // pick_overarm_enum_value = pick_overarm::OVERARM_RETURNED ;
         break;
@@ -179,14 +178,11 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick)
         task_executor();
         // close the gripper here
         top_retreat("TOP RETREAT");
-        task_executor();        
         set_joint_goal("TOP PRE RETURN", top_pre_pick_angles);
         task_executor();
         top_approach("TOP APPROACH RETURN", obj_to_pick);
-        task_executor();
         // open the gripper here
         top_retreat("TOP RETREAT");
-        task_executor();         
         // Move home after putting the sample back
         set_joint_goal("MOVE ARM HOME", rest_angles);
         task_executor();  
@@ -427,24 +423,21 @@ void MTCPlanner::top_approach(std::string take_name, std::string obj_to_pick){
 
     // Retreive the length of the gripper
     double hand_offset = node_->get_parameter("ur3e.hand_offset").as_double();
+    double axis_tolarance = node_->get_parameter("ur3e.axis_tolarance").as_double();
 
     // Calculate distances to the target
     double obj_x = node_->get_parameter("objects." + obj_to_pick + ".x").as_double() ;
     double obj_y = node_->get_parameter("objects." + obj_to_pick + ".y").as_double() ;
-    double obj_z = node_->get_parameter("objects." + obj_to_pick + ".z").as_double() ;
+    double obj_z = node_->get_parameter("objects." + obj_to_pick + ".z").as_double() + hand_offset + 0.05 + 0.05;
 
 
     // Retrieve arm location in xyz
     geometry_msgs::msg::PoseStamped arm_pose ;
     arm_pose = MTCPlanner::get_eef_pose();
 
-    // MTCPlanner::arm_top_approach_dists.pose.position.x =  obj_x - (arm_pose.pose.position.x - finger_offset_x) ;
-    // MTCPlanner::arm_top_approach_dists.pose.position.y =  obj_y - (arm_pose.pose.position.y + finger_offset_y) ;
-    // MTCPlanner::arm_top_approach_dists.pose.position.z =  obj_z - (arm_pose.pose.position.z + finger_offset_z) ;
-
-    MTCPlanner::arm_top_approach_dists.pose.position.x =  obj_x - finger_offset_x ;
-    MTCPlanner::arm_top_approach_dists.pose.position.y =  obj_y - finger_offset_y ;
-    MTCPlanner::arm_top_approach_dists.pose.position.z =  obj_z + finger_offset_z + hand_offset;    
+    MTCPlanner::arm_top_approach_dists.pose.position.x =  obj_x - (arm_pose.pose.position.x ) ;
+    MTCPlanner::arm_top_approach_dists.pose.position.y =  obj_y - (arm_pose.pose.position.y ) ;
+    MTCPlanner::arm_top_approach_dists.pose.position.z =  obj_z - (arm_pose.pose.position.z ) ;   
 
     RCLCPP_INFO(LOGGER, "obj_x : %f ", obj_x );  
     RCLCPP_INFO(LOGGER, "obj_y : %f ", obj_y );  
@@ -461,93 +454,87 @@ void MTCPlanner::top_approach(std::string take_name, std::string obj_to_pick){
 
     using moveit::planning_interface::MoveGroupInterface;
     auto move_group_interface = MoveGroupInterface(node_, "ur_arm");
-    move_group_interface.setEndEffectorLink(eff_name_);
 
-//   geometry_msgs::msg::PoseStamped start_pose ;
-//   start_pose = move_group_interface.getCurrentPose();
-
-//     RCLCPP_INFO(LOGGER, "start_pose.pose.position.x : %f ", start_pose.pose.position.x );  
-//     RCLCPP_INFO(LOGGER, "start_pose.pose.position.y : %f ", start_pose.pose.position.y );  
-//     RCLCPP_INFO(LOGGER, "start_pose.pose.position.z : %f ", start_pose.pose.position.z );  
-
+    double x_incs = (MTCPlanner::arm_top_approach_dists.pose.position.x)/2 ; 
+    double y_incs = (MTCPlanner::arm_top_approach_dists.pose.position.y)/2 ; 
+    double z_incs = (MTCPlanner::arm_top_approach_dists.pose.position.z)/2 ; 
 
   // Calculate the Bezier points
   std::vector<geometry_msgs::msg::Pose> waypoints;
-
-    geometry_msgs::msg::Pose goal_pose;
-    goal_pose.position.x = MTCPlanner::arm_top_approach_dists.pose.position.x;
-    waypoints.push_back(goal_pose);
-
-    goal_pose.position.y = MTCPlanner::arm_top_approach_dists.pose.position.y ;
-    waypoints.push_back(goal_pose);
-
-    goal_pose.position.z = MTCPlanner::arm_top_approach_dists.pose.position.z ;
-    goal_pose.orientation = arm_pose.pose.orientation ;
-    waypoints.push_back(goal_pose);
+    geometry_msgs::msg::Pose intrm_pose ;
 
 
-  moveit_msgs::msg::RobotTrajectory trajectory;
-  const double jump_threshold = 0.0;
-  const double eef_step = 0.001;
+    intrm_pose.position.x = arm_pose.pose.position.x ;
+    intrm_pose.position.y = arm_pose.pose.position.y ;
+    intrm_pose.position.z = arm_pose.pose.position.z ;
 
-  move_group_interface.computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
+    intrm_pose.orientation.w = arm_pose.pose.orientation.w ;
+    intrm_pose.orientation.x = arm_pose.pose.orientation.x ;
+    intrm_pose.orientation.y = arm_pose.pose.orientation.y ;
+    intrm_pose.orientation.z = arm_pose.pose.orientation.z ;
+
+    // Add constraints
+    moveit_msgs::msg::OrientationConstraint ocm;
+    ocm.link_name = "wrist_3_link";
+    ocm.link_name = "flange";
+    ocm.header.frame_id = "base_link";
+    ocm.weight = 1.0;
+
+    ocm.absolute_x_axis_tolerance = axis_tolarance ;
+    ocm.absolute_y_axis_tolerance = axis_tolarance ;
+
+    ocm.orientation.w = arm_pose.pose.orientation.w ;
+    ocm.orientation.x = arm_pose.pose.orientation.x ;
+    ocm.orientation.y = arm_pose.pose.orientation.y ;
+    ocm.orientation.z = arm_pose.pose.orientation.z;
+
+    // Calculate linear intermediate points for x and y directions
+    for (double j = arm_pose.pose.position.x, k = arm_pose.pose.position.y; std::abs(obj_x - j) > 0.00001; j += x_incs, k += y_incs) {
+
+        intrm_pose.position.x = j ;
+        intrm_pose.position.y = k ;
+
+        waypoints.push_back(intrm_pose);
+    }
     
- move_group_interface.execute(trajectory);
+    // Add the waypoints, including the final point
+    intrm_pose.position.x = obj_x ;
+    intrm_pose.position.y = obj_y ;
+    waypoints.push_back(intrm_pose);
 
-// auto moveit_visual_tools_ =  new moveit_visual_tools::MoveItVisualTools{ node_, "ur_arm", 
-//                   rviz_visual_tools::RVIZ_MARKER_TOPIC, move_group_interface.getRobotModel() };		
+    // Execute the cartesian trajectory
+    moveit_msgs::msg::RobotTrajectory trajectory;
+    const double jump_threshold = 0.0;
+    const double eef_step = 0.01;
 
-// moveit_visual_tools_->trigger();
+    moveit_msgs::msg::Constraints test_constraints;
+    test_constraints.orientation_constraints.push_back(ocm);
+    move_group_interface.setPathConstraints(test_constraints);
 
-//     MTCPlanner::task_.clear();
-//     MTCPlanner::task_.stages()->setName(take_name);
-//     MTCPlanner::task_.loadRobotModel(node_);
+    move_group_interface.computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
+    move_group_interface.execute(trajectory);
 
-//     MTCPlanner::task_.setProperty("group", arm_group_name_);
-//     MTCPlanner::task_.setProperty("eef", eff_name_);
-//     MTCPlanner::task_.setProperty("ik_frame", hand_frame_);
-//     MTCPlanner::task_.setProperty("hand", hand_group_name_);
-//     MTCPlanner::task_.setProperty("hand_grasping_frame", hand_frame_);
+    //clear the old waypoints
+    waypoints.clear();
 
-//     // Disable warnings for this line, as it's a variable that's set but not used in this example
-//     #pragma GCC diagnostic push
-//     #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-//     moveit::task_constructor::Stage* current_state_ptr = nullptr;  // Forward current_state on to grasp pose generator
-//     #pragma GCC diagnostic pop
+    // Do the same for z direction
+    // Calculate linear intermediate points for x and y directions
+    for (double i = arm_pose.pose.position.z; std::abs(obj_z - i) > 0.00001; i += z_incs) {
 
-//   auto sampling_planner = std::make_shared<moveit::task_constructor::solvers::PipelinePlanner>(node_);
-//   sampling_planner->setProperty("planning_plugin","chomp_interface/CHOMPPlanner");
-//   auto interpolation_planner = std::make_shared<moveit::task_constructor::solvers::JointInterpolationPlanner>();
+        intrm_pose.position.z = i ;
+        RCLCPP_INFO(LOGGER, "intrm_pose.position.z : %f ", intrm_pose.position.z );  
+        RCLCPP_INFO(LOGGER, "std::abs(obj_z - i)  : %f ", std::abs(obj_z - i) );  
 
-//   auto cartesian_planner = std::make_shared<moveit::task_constructor::solvers::CartesianPath>();
-//   cartesian_planner->setMaxVelocityScaling(1.0);
-//   cartesian_planner->setMaxAccelerationScaling(1.0);
-//   cartesian_planner->setStepSize(.01);
+        waypoints.push_back(intrm_pose);
+        break ;
+    }
+    
+    // Add the waypoints, including the final point
+    intrm_pose.position.z = obj_z ;
+    waypoints.push_back(intrm_pose);
 
-
-//   auto stage_state_current = std::make_unique<moveit::task_constructor::stages::CurrentState>("current");
-//   current_state_ptr = stage_state_current.get();
-//   MTCPlanner::task_.add(std::move(stage_state_current));
-
-
-//     {
-//         auto stage = std::make_unique<moveit::task_constructor::stages::GeneratePose>("approach object x");
-//     //     stage->properties().set("marker_ns", "approachx");
-//     //     stage->properties().set("link", eff_name_);
-//     //     stage->properties().configureInitFrom(moveit::task_constructor::Stage::PARENT, { "group" });
-//     //     stage->setMinMaxDistance(0.1, 0.15);
-
-//     //     // Set hand forward direction
-//         geometry_msgs::msg::PoseStamped goal_pose;
-//         goal_pose.header.frame_id = hand_frame_;
-//         goal_pose.pose.position.x = 0.25 ;
-//         goal_pose.pose.position.y = -0.1 ;
-//         goal_pose.pose.position.z = 0.35 ;
-//         stage->setPose(goal_pose);
-//     //     stage->setDirection(vec);
-//     //     RCLCPP_INFO(LOGGER, "vec.vector.x  : %f ", vec.vector.x );  
-//         MTCPlanner::task_.add(std::move(stage));
-//     }
+    move_group_interface.computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
+    move_group_interface.execute(trajectory);
 
 }
 /*
@@ -642,16 +629,16 @@ void MTCPlanner::top_approach(std::string take_name, std::string obj_to_pick){
 
 
 void MTCPlanner::top_retreat(std::string take_name){
-
-    // Retrieve arm location in xyz
     geometry_msgs::msg::PoseStamped arm_pose ;
     arm_pose = MTCPlanner::get_eef_pose();
+
+    double axis_tolarance = node_->get_parameter("ur3e.axis_tolarance").as_double();
 
     using moveit::planning_interface::MoveGroupInterface;
     auto move_group_interface = MoveGroupInterface(node_, "ur_arm");
 
-  // Calculate the Bezier points
-  std::vector<geometry_msgs::msg::Pose> waypoints;
+    // Calculate the Bezier points
+    std::vector<geometry_msgs::msg::Pose> waypoints;
 
     geometry_msgs::msg::Pose goal_pose;
     // goal_pose.position.x = MTCPlanner::arm_top_approach_dists.pose.position.x;
@@ -660,66 +647,50 @@ void MTCPlanner::top_retreat(std::string take_name){
     // goal_pose.position.y = MTCPlanner::arm_top_approach_dists.pose.position.y ;
     // waypoints.push_back(goal_pose);
 
-    goal_pose.position.z = arm_pose.pose.orientation.z + 0.1;
+    goal_pose.position.x = arm_pose.pose.position.x - MTCPlanner::arm_top_approach_dists.pose.position.x;
+    goal_pose.position.y = arm_pose.pose.position.y - MTCPlanner::arm_top_approach_dists.pose.position.y;
+    goal_pose.position.z = arm_pose.pose.position.z - MTCPlanner::arm_top_approach_dists.pose.position.z;
+
     goal_pose.orientation = arm_pose.pose.orientation ;
     waypoints.push_back(goal_pose);
 
-  moveit_msgs::msg::RobotTrajectory trajectory;
-  const double jump_threshold = 0.0;
-  const double eef_step = 0.001;
+    RCLCPP_INFO(LOGGER, "arm_pose.pose.position.x : %f ", arm_pose.pose.position.x );  
+    RCLCPP_INFO(LOGGER, "arm_pose.pose.position.y : %f ", arm_pose.pose.position.y );  
+    RCLCPP_INFO(LOGGER, "arm_pose.pose.position.z : %f ", arm_pose.pose.position.z );  
 
-  move_group_interface.computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
+
+    RCLCPP_INFO(LOGGER, "goal_pose.position.x : %f ", goal_pose.position.x );  
+    RCLCPP_INFO(LOGGER, "goal_pose.position.y : %f ", goal_pose.position.y );  
+    RCLCPP_INFO(LOGGER, "goal_pose.position.z : %f ", goal_pose.position.z );  
+
+
+    // Add constraints
+    moveit_msgs::msg::OrientationConstraint ocm;
+    ocm.link_name = "wrist_3_link";
+    ocm.link_name = "flange";
+    ocm.header.frame_id = "base_link";
+    ocm.weight = 1.0;
+
+    ocm.absolute_x_axis_tolerance = axis_tolarance ;
+    ocm.absolute_y_axis_tolerance = axis_tolarance ;
+
+    ocm.orientation.w = arm_pose.pose.orientation.w ;
+    ocm.orientation.x = arm_pose.pose.orientation.x ;
+    ocm.orientation.y = arm_pose.pose.orientation.y ;
+    ocm.orientation.z = arm_pose.pose.orientation.z;
+
+    moveit_msgs::msg::Constraints test_constraints;
+    test_constraints.orientation_constraints.push_back(ocm);
+    move_group_interface.setPathConstraints(test_constraints);
+
+    moveit_msgs::msg::RobotTrajectory trajectory;
+    const double jump_threshold = 0.0;
+    const double eef_step = 0.01;
+
+    move_group_interface.computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
     
- move_group_interface.execute(trajectory);
+    move_group_interface.execute(trajectory);
 
-/*
-    MTCPlanner::task_.clear();
-    MTCPlanner::task_.stages()->setName(take_name);
-    MTCPlanner::task_.loadRobotModel(node_);
-
-    MTCPlanner::task_.setProperty("group", arm_group_name_);
-    MTCPlanner::task_.setProperty("eef", eff_name_);
-    MTCPlanner::task_.setProperty("ik_frame", hand_frame_);
-    MTCPlanner::task_.setProperty("hand", hand_group_name_);
-    MTCPlanner::task_.setProperty("hand_grasping_frame", hand_frame_);
-
-    // Disable warnings for this line, as it's a variable that's set but not used in this example
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-    moveit::task_constructor::Stage* current_state_ptr = nullptr;  // Forward current_state on to grasp pose generator
-    #pragma GCC diagnostic pop
-
-  auto sampling_planner = std::make_shared<moveit::task_constructor::solvers::PipelinePlanner>(node_);
-  sampling_planner->setProperty("planning_plugin","chomp_interface/CHOMPPlanner");
-  auto interpolation_planner = std::make_shared<moveit::task_constructor::solvers::JointInterpolationPlanner>();
-
-  auto cartesian_planner = std::make_shared<moveit::task_constructor::solvers::CartesianPath>();
-  cartesian_planner->setMaxVelocityScaling(1.0);
-  cartesian_planner->setMaxAccelerationScaling(1.0);
-  cartesian_planner->setStepSize(.01);
-
-
-  auto stage_state_current = std::make_unique<moveit::task_constructor::stages::CurrentState>("current");
-  current_state_ptr = stage_state_current.get();
-  MTCPlanner::task_.add(std::move(stage_state_current));
-
-    {
-        auto stage = std::make_unique<moveit::task_constructor::stages::MoveRelative>("approach object x", cartesian_planner);
-        stage->properties().set("marker_ns", "approachx");
-        stage->properties().set("link", eff_name_);
-        stage->properties().configureInitFrom(moveit::task_constructor::Stage::PARENT, { "group" });
-        stage->setMinMaxDistance(0.1, 0.15);
-
-        // Set hand forward direction
-        geometry_msgs::msg::Vector3Stamped vec;
-        vec.header.frame_id = hand_frame_;
-        vec.vector.x = -MTCPlanner::arm_top_approach_dists.pose.position.x ;
-        vec.vector.y = -MTCPlanner::arm_top_approach_dists.pose.position.y ;
-        vec.vector.z = -MTCPlanner::arm_top_approach_dists.pose.position.z ;
-        stage->setDirection(vec);
-        MTCPlanner::task_.add(std::move(stage));
-    }
-    */
 }
 
 
@@ -809,7 +780,7 @@ geometry_msgs::msg::PoseStamped MTCPlanner::get_eef_pose(){
 
     try {
         // Read the tranform
-        t = tf_buffer_->lookupTransform( MTCPlanner::base_frame, MTCPlanner::eef_frame, tf2::TimePointZero);
+        t = tf_buffer_->lookupTransform( MTCPlanner::base_frame, "flange", tf2::TimePointZero);
 
         // populate the fields
         eef_pose.pose.position.x = t.transform.translation.x ;
@@ -822,14 +793,6 @@ geometry_msgs::msg::PoseStamped MTCPlanner::get_eef_pose(){
         RCLCPP_INFO( node_->get_logger(), "Could not transform %s to %s: %s", MTCPlanner::base_frame.c_str(), MTCPlanner::eef_frame.c_str(), ex.what());
 
     }
-    // std::cout << "&&&&&&&& TF &&&&&&&&" << std::endl;
-    // std::cout << t.transform.translation.x << std::endl;
-    // std::cout << "###########################"<< std::endl;
-
-    // RCLCPP_INFO(LOGGER, "arm_pose.pose.position.x : %f ", t.transform.translation.x  );  
-    // RCLCPP_INFO(LOGGER, "arm_pose.pose.position.y : %f ", t.transform.translation.y  );  
-    // RCLCPP_INFO(LOGGER, "arm_pose.pose.position.z : %f ", t.transform.translation.z );  
-
     return eef_pose ;
 
 }

@@ -38,19 +38,7 @@ void URTaskManager::create_nodes(){
 
   URTaskManager::planning_scene_interface = new moveit::planning_interface::PlanningSceneInterface() ;
 
-    geometry_msgs::msg::PoseStamped arm_pose ;
-    arm_pose = URTaskManager::move_group_interface_->getCurrentPose();
-
-    std::cout << "***************************" << std::endl;
-    std::cout << arm_pose.pose.position.x << std::endl;
-    std::cout << "###########################"<< std::endl;
-
-    // RCLCPP_INFO(URTaskManager::LOGGER, "arm_pose.pose.position.x : %f ", arm_pose.pose.position.x  );  
-    // RCLCPP_INFO(URTaskManager::LOGGER, "arm_pose.pose.position.y : %f ", arm_pose.pose.position.y  );  
-    // RCLCPP_INFO(URTaskManager::LOGGER, "arm_pose.pose.position.z : %f ", arm_pose.pose.position.z  ); 
-
-
-  URTaskManager::mtc_planner_node_ = new MTCPlanner(node_, URTaskManager::move_group_interface_);
+  URTaskManager::mtc_planner_node_ = new MTCPlanner(node_);
 
   mtc_planner_node_->grab_from_top("sample1");
   

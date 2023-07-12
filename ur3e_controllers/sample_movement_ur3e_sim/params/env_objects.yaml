@@ -1,23 +1,32 @@
 ur_task_manager:
   ros__parameters:
-    num_objects: 3
-    object_names: ['sample1','sample2','target']
+    num_objects: 4
+    object_names: ['sample1','sample2','target', 'table']
     objects:
       sample1:
         type: 'CYLINDER'
         h: 0.1 # height
         r: 0.02 # radius
-        x: 0.05
-        y: -0.25
-        z: 0.0
+        x: 0.35
+        y: -0.1
+        z: 0.05
       sample2:
         type: 'CYLINDER'
         h: 0.1 # height
         r: 0.02 # radius
-        x: 0.05
-        y: -0.2
-        z: 0.01
+        x: 0.45
+        y: -0.0
+        z: 0.05
       target:
+        type: 'BOX'
+        w: 0.1 # width
+        d: 0.1 # depth
+        h: 0.01 # height
+        #w: 0.0 # pose, orientation 
+        x: -0.35 # pose x
+        y: 0.0 # pose y
+        z: 0.01 # pose z
+      table:
         type: 'BOX'
         w: 2.0 # width
         d: 2.0 # depth
@@ -27,9 +36,17 @@ ur_task_manager:
         y: 0.0 # pose y
         z: -0.01 # pose z
     ur3e:
-      joint_names: ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint']
-      home_angels: [-1.600699, -1.727100, -2.202999, -0.807999, 1.595100] #[shoulder_pan_joint, shoulder_lift_joint, elbow_joint, wrist_1_joint, wrist_2_joint]
-      underarm_turn_angels: [-2.99, -2.25217287,  -1.6051793, -2.36996786, -1.5892968] # The order of the angles has to be changes if the current results in collisions
-      top_pre_pick: [-2.99, -1.727100, -2.202999, -0.807999, 1.595100]
-      top_pre_place: [-2.99, -1.727100, -2.202999, -0.807999, 1.595100] # Change when testing
-      hand_offset: 0.07
+      joint_names: ['shoulder_pan_joint' , 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint']
+      rest_angels: [-1.600699, -1.4477506, -1.7994345, -1.4871951, 1.595100] #[shoulder_pan_joint, shoulder_lift_joint, elbow_joint, wrist_1_joint, wrist_2_joint]
+      underarm_turn_angels: [-1.600699 , -2.25217287,  -1.6051793, -2.36996786, -1.5892968] # The order of the angles has to be changes if the current results in collisions
+#      underarm_turn_angels: [-2.99, -2.25217287,  -1.6051793, -2.36996786, -1.5892968] # The order of the angles has to be changes if the current results in collisions
+      top_pre_pick: [-2.99, -1.4477506, -1.7994345, -1.4871951, 1.595100]
+      top_pre_place: [0.0, -1.4477506, -1.7994345, -1.4871951, 1.595100] 
+      hand_offset: 0.1
+      base_frame: 'base_link'
+      eef_frame: 'right_finger'
+      finger_offset_x: 0.0
+      finger_offset_y: 0.0
+      finger_offset_z: 0.01
+      axis_tolarance: 0.1
+

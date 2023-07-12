@@ -9,11 +9,18 @@
 #include <memory>
 
 #include <moveit/move_group_interface/move_group_interface.h>
+#include <moveit/planning_scene/planning_scene.h>
+#include <moveit/planning_scene_interface/planning_scene_interface.h>
+#include <moveit_visual_tools/moveit_visual_tools.h>
 
 #include <moveit_task_constructor_msgs/action/execute_task_solution.hpp>
 #include <moveit/task_constructor/task.h>
 #include <moveit/task_constructor/solvers.h>
 #include <moveit/task_constructor/stages.h>
+
+#include "tf2_ros/buffer.h"
+#include "tf2_ros/transform_listener.h"
+
 
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("mtc_fcns");
 using namespace std::chrono_literals;
@@ -22,7 +29,7 @@ class MTCPlanner
 {
     public:
     
-        MTCPlanner(const rclcpp::Node::SharedPtr& node, moveit::planning_interface::MoveGroupInterface *move_group_intrfc);
+        MTCPlanner(const rclcpp::Node::SharedPtr& node);
         void initialize();
         void grab_from_top(std::string obj_to_pick);
         void grab_from_side(std::string obj_to_pick);
@@ -32,13 +39,13 @@ class MTCPlanner
     private:
 
         rclcpp::Node::SharedPtr node_;
-        moveit::planning_interface::MoveGroupInterface *move_group_intrfc_ ;
+        // moveit::planning_interface::MoveGroupInterface *move_group_intrfc_ ;
 
         moveit::task_constructor::Task task_;
         /// @brief Joint names for the ur3e arm
         std::vector<std::string> joint_names ;
         /// @brief Home / rest location for the ur3e arm
-        std::vector<double> home_angles ;       
+        std::vector<double> rest_angles ;       
         /// @brief Turn towards the samples for the ur3e arm
         std::vector<double> top_pre_pick_angles ;
         /// @brief Turn towards the place area for the ur3e arm
@@ -50,6 +57,14 @@ class MTCPlanner
 
         geometry_msgs::msg::PoseStamped arm_top_approach_dists ;
 
+        // To compute transform coords
+        std::shared_ptr<tf2_ros::TransformListener> tf_listener_{nullptr};
+        std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
+
+        std::string base_frame ;
+        std::string eef_frame ;
+
+        double finger_offset_x , finger_offset_y,  finger_offset_z ;
 
         enum class pick_overarm{
             OVERARM_HOME, OVERARM_PICK, OVERARM_PLACE, OVERARM_RETURNED 
@@ -73,6 +88,12 @@ class MTCPlanner
         void top_swipe();
         void top_approach(std::string take_name, std::string obj_to_picks);
         void top_retreat(std::string take_name) ;
+
+        void underarm_approach(std::string take_name, std::string obj_to_picks);
+        void underarm_retreat(std::string take_name, std::string obj_to_picks) ;
+
+        geometry_msgs::msg::PoseStamped get_eef_pose();
+
 
 };
 

@@ -46,6 +46,10 @@ class URTaskManager
     /// @brief This maps the collision ojbect type to an integer to be used in switch statement.
     std::map<std::string, int> obj_type_map ;
 
+    // Record pose of the enf effector
+    double eef_pose_x ;
+    double eef_pose_y ;
+    double eef_pose_z ;
 
     std::shared_ptr<rclcpp::ParameterEventHandler> param_subscriber_;
     /// @brief callback handle for the topic from sample location
