@@ -41,10 +41,10 @@ ur_task_manager:
       underarm_turn_angels: [-1.600699 , -2.25217287,  -1.6051793, -2.36996786, -1.5892968] # The order of the angles has to be changes if the current results in collisions
 #      underarm_turn_angels: [-2.99, -2.25217287,  -1.6051793, -2.36996786, -1.5892968] # The order of the angles has to be changes if the current results in collisions
       top_pre_pick: [-2.99, -1.4477506, -1.7994345, -1.4871951, 1.595100]
-      top_pre_place: [0.0, -1.4477506, -1.7994345, -1.4871951, 1.595100] 
+      top_pre_place: [0.00, -1.4477506, -1.7994345, -1.4871951, 1.595100] 
       hand_offset: 0.1
       base_frame: 'base_link'
-      eef_frame: 'right_finger'
+      eef_frame: 'flange'
       finger_offset_x: 0.0
       finger_offset_y: 0.0
       finger_offset_z: 0.01
