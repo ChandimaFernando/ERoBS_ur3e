@@ -128,7 +128,7 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick)
     std::chrono::nanoseconds sleep_time = 3000ms ;
     rclcpp::sleep_for(sleep_time);
     // for (int i = static_cast<int>(pick_overarm::OVERARM_HOME) ; i <= static_cast<int>(pick_overarm::OVERARM_RETURNED) ; i++)
-    for (int i = 0 ; i <= 3 ; i++)
+    for (int i = 2 ; i <= 3 ; i++)
     {
         // pick_overarm pick_overarm_enum_value = pick_overarm::OVERARM_PICK ;
         pick_overarm pick_overarm_enum_value = static_cast<pick_overarm>(i);
@@ -163,7 +163,7 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick)
 
     case pick_overarm::OVERARM_PLACE:
         RCLCPP_INFO(LOGGER, "Inside pick_overarm::OVERARM_PLACE ");  
-        set_joint_goal("TOP PRE PLCE", top_pre_pick_angles);
+        set_joint_goal("TOP PRE PLCE", top_pre_place_angles);
         task_executor();
         top_approach("TOP APPROACH PLACE", "target");
         // Open the gripper here
@@ -780,7 +780,7 @@ geometry_msgs::msg::PoseStamped MTCPlanner::get_eef_pose(){
 
     try {
         // Read the tranform
-        t = tf_buffer_->lookupTransform( MTCPlanner::base_frame, "flange", tf2::TimePointZero);
+        t = tf_buffer_->lookupTransform( MTCPlanner::base_frame, MTCPlanner::eef_frame, tf2::TimePointZero);
 
         // populate the fields
         eef_pose.pose.position.x = t.transform.translation.x ;

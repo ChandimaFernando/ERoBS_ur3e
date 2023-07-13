@@ -30,17 +30,23 @@ class MTCPlanner
     public:
     
         MTCPlanner(const rclcpp::Node::SharedPtr& node);
+        /// @brief read and save values from the param file
         void initialize();
+        /// @brief State machine equivalent of picking from top
+        /// @param obj_to_pick 
         void grab_from_top(std::string obj_to_pick);
+        /// @brief State machine equivalent of picking from under arm
+        /// @param obj_to_pick 
         void grab_from_side(std::string obj_to_pick);
+        /// @brief Common function to 
         void task_executor();
-        // void set_sample_location();
 
     private:
 
         rclcpp::Node::SharedPtr node_;
         // moveit::planning_interface::MoveGroupInterface *move_group_intrfc_ ;
 
+        /// @brief Global variable to assign and pass each task
         moveit::task_constructor::Task task_;
         /// @brief Joint names for the ur3e arm
         std::vector<std::string> joint_names ;
@@ -52,20 +58,26 @@ class MTCPlanner
         std::vector<double> top_pre_place_angles ;
         /// @brief Underarm pose
         std::vector<double> underarm_turn_angels ;
+        /// @brief Holds sample location read from the params file
         std::vector<geometry_msgs::msg::Pose> sample_locations ; //= geometry_msgs::msg::Pose();
         geometry_msgs::msg::Pose taregt_location = geometry_msgs::msg::Pose();
 
+        /// @brief Records the distance the eef traveled to grab a sample / place at the target
         geometry_msgs::msg::PoseStamped arm_top_approach_dists ;
 
         // To compute transform coords
         std::shared_ptr<tf2_ros::TransformListener> tf_listener_{nullptr};
         std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
 
+        /// @brief base anf the end effector frames : base_link and flange
         std::string base_frame ;
         std::string eef_frame ;
 
+        // Delete the irrelevent onces later
         double finger_offset_x , finger_offset_y,  finger_offset_z ;
 
+
+        /// @brief 
         enum class pick_overarm{
             OVERARM_HOME, OVERARM_PICK, OVERARM_PLACE, OVERARM_RETURNED 
         };
