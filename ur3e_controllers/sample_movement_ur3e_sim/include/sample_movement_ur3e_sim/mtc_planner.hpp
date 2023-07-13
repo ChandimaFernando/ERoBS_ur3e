@@ -42,6 +42,9 @@ class MTCPlanner
         /// @brief Common function to 
         void task_executor();
         void gripper_open();
+        void gripper_close();
+        void gripper_activate();
+
 
     private:
 

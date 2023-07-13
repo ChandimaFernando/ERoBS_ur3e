@@ -130,7 +130,7 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick)
     std::chrono::nanoseconds sleep_time = 3000ms ;
     rclcpp::sleep_for(sleep_time);
     // for (int i = static_cast<int>(pick_overarm::OVERARM_HOME) ; i <= static_cast<int>(pick_overarm::OVERARM_RETURNED) ; i++)
-    for (int i = 2 ; i <= 3 ; i++)
+    for (int i = 0 ; i <= 0 ; i++)
     {
         // pick_overarm pick_overarm_enum_value = pick_overarm::OVERARM_PICK ;
         pick_overarm pick_overarm_enum_value = static_cast<pick_overarm>(i);
@@ -805,6 +805,60 @@ void MTCPlanner::gripper_open(){
 
   request->grip = 10 ;
   request->cmd = 'O' ;
+
+  while (!client_->wait_for_service(1s)) {
+    if (!rclcpp::ok()) {
+      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+    }
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
+  }
+
+  auto result = client_->async_send_request(request);
+
+  // Wait for the result.
+  if (rclcpp::spin_until_future_complete(node_, result) ==
+    rclcpp::FutureReturnCode::SUCCESS)
+  {
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Results: %d", result.get()->status);
+  } else {
+    RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service");
+  }
+
+}
+
+void MTCPlanner::gripper_close(){
+
+  auto request = std::make_shared<custom_msgs::srv::GripperCmd::Request>();
+
+  request->grip = 10 ;
+  request->cmd = 'C' ;
+
+  while (!client_->wait_for_service(1s)) {
+    if (!rclcpp::ok()) {
+      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+    }
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
+  }
+
+  auto result = client_->async_send_request(request);
+
+  // Wait for the result.
+  if (rclcpp::spin_until_future_complete(node_, result) ==
+    rclcpp::FutureReturnCode::SUCCESS)
+  {
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Results: %d", result.get()->status);
+  } else {
+    RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service");
+  }
+
+}
+
+void MTCPlanner::gripper_activate(){
+
+  auto request = std::make_shared<custom_msgs::srv::GripperCmd::Request>();
+
+  request->grip = 10 ;
+  request->cmd = 'A' ;
 
   while (!client_->wait_for_service(1s)) {
     if (!rclcpp::ok()) {
