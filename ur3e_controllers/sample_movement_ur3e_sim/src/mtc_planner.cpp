@@ -3,6 +3,8 @@
 MTCPlanner::MTCPlanner(const rclcpp::Node::SharedPtr& node)
 {
     node_ = node ;
+    client_  = node->create_client<custom_msgs::srv::GripperCmd>("gripper_service");
+
 
     initialize();
 }
@@ -794,5 +796,32 @@ geometry_msgs::msg::PoseStamped MTCPlanner::get_eef_pose(){
 
     }
     return eef_pose ;
+
+}
+
+void MTCPlanner::gripper_open(){
+
+  auto request = std::make_shared<custom_msgs::srv::GripperCmd::Request>();
+
+  request->grip = 10 ;
+  request->cmd = 'O' ;
+
+  while (!client_->wait_for_service(1s)) {
+    if (!rclcpp::ok()) {
+      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+    }
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
+  }
+
+  auto result = client_->async_send_request(request);
+
+  // Wait for the result.
+  if (rclcpp::spin_until_future_complete(node_, result) ==
+    rclcpp::FutureReturnCode::SUCCESS)
+  {
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Results: %d", result.get()->status);
+  } else {
+    RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service");
+  }
 
 }

@@ -14,6 +14,8 @@ find_package(moveit_ros_planning_interface REQUIRED)
 find_package(moveit_visual_tools REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(moveit_task_constructor_core REQUIRED)
+find_package(custom_msgs REQUIRED)
+
 
 # uncomment the following section in order to fill in
 # further dependencies manually.
@@ -34,12 +36,14 @@ ament_target_dependencies(
   moveit_visual_tools
   geometry_msgs
   moveit_task_constructor_core
+  custom_msgs
 )
 
 ament_target_dependencies(
   sample_place_publisher
   rclcpp
   geometry_msgs
+  custom_msgs
 )
 
 target_include_directories(sample_movement_ur3e_sim PUBLIC

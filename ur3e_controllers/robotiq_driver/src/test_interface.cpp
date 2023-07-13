@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 
   auto request = std::make_shared<custom_msgs::srv::GripperCmd::Request>();
   request->grip = 10 ;
-  request->cmd = 'D' ;
+  request->cmd = 'O' ;
 
   while (!client->wait_for_service(1s)) {
     if (!rclcpp::ok()) {

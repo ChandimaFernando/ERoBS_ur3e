@@ -21,6 +21,7 @@
 #include "tf2_ros/buffer.h"
 #include "tf2_ros/transform_listener.h"
 
+#include "custom_msgs/srv/gripper_cmd.hpp"
 
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("mtc_fcns");
 using namespace std::chrono_literals;
@@ -40,11 +41,13 @@ class MTCPlanner
         void grab_from_side(std::string obj_to_pick);
         /// @brief Common function to 
         void task_executor();
+        void gripper_open();
 
     private:
 
         rclcpp::Node::SharedPtr node_;
         // moveit::planning_interface::MoveGroupInterface *move_group_intrfc_ ;
+        rclcpp::Client<custom_msgs::srv::GripperCmd>::SharedPtr client_;
 
         /// @brief Global variable to assign and pass each task
         moveit::task_constructor::Task task_;
