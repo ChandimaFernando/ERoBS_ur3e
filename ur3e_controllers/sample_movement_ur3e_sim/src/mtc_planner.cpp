@@ -144,7 +144,9 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick)
             RCLCPP_INFO(LOGGER, "Inside pick_overarm::OVERARM_HOME ");  
             set_joint_goal("MOVE ARM HOME", rest_angles);
             task_executor();
+            rclcpp::sleep_for(sleep_time);
             gripper_close();
+            rclcpp::sleep_for(sleep_time);
             arm_at_home = true ;
         }
         
@@ -156,9 +158,11 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick)
         set_joint_goal("TOP PRE PICK", top_pre_pick_angles);
         task_executor();
 
+        rclcpp::sleep_for(sleep_time);
         gripper_open();
+        rclcpp::sleep_for(sleep_time);
         gripper_close();
-
+        rclcpp::sleep_for(sleep_time);
 
 
 
@@ -176,9 +180,11 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick)
         set_joint_goal("TOP PRE PLCE", top_pre_place_angles);
         task_executor();
 
+        rclcpp::sleep_for(sleep_time);
         gripper_open();
+        rclcpp::sleep_for(sleep_time);
         gripper_close();
-        
+        rclcpp::sleep_for(sleep_time);
      /*   top_approach("TOP APPROACH PLACE", "target");
         // Open the gripper here
         top_retreat("TOP RETREAT"); */
@@ -190,14 +196,22 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick)
         RCLCPP_INFO(LOGGER, "Inside pick_overarm::OVERARM_RETURNED ");  
  
  
+        rclcpp::sleep_for(sleep_time);
         gripper_open();
+        rclcpp::sleep_for(sleep_time);
         gripper_close();
+        rclcpp::sleep_for(sleep_time);
         set_joint_goal("TOP PRE RETURN", top_pre_pick_angles);
+        task_executor();
 
+        rclcpp::sleep_for(sleep_time);
         gripper_open();
+        rclcpp::sleep_for(sleep_time);
         gripper_close();
- 
+        rclcpp::sleep_for(sleep_time);
+
         set_joint_goal("MOVE ARM HOME", rest_angles);
+        task_executor();
  /*       top_approach("TOP APPROACH RETURN", "target");
         task_executor();
         // close the gripper here
