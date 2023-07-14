@@ -516,6 +516,9 @@ void MTCPlanner::top_approach(std::string take_name, std::string obj_to_pick){
     move_group_interface.computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
     move_group_interface.execute(trajectory);
 
+    std::chrono::nanoseconds sleep_time = 3000ms ;
+    rclcpp::sleep_for(sleep_time);
+
     //clear the old waypoints
     waypoints.clear();
 

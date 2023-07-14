@@ -8,7 +8,7 @@ ur_task_manager:
         h: 0.1 # height
         r: 0.02 # radius
         x: 0.22
-        y: -0.45
+        y: -0.43
         z: 0.01
       sample2:
         type: 'CYLINDER'
