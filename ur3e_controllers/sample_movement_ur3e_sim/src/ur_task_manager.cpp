@@ -5,9 +5,8 @@ using moveit::planning_interface::MoveGroupInterface;
 URTaskManager::URTaskManager(const rclcpp::NodeOptions& options)
   : node_{ std::make_shared<rclcpp::Node>("ur_task_manager", options) }
 {
-
   create_nodes();
-  // create_env();
+  create_env();
 
   subscription_ = node_->create_subscription<geometry_msgs::msg::Pose>(
       "sample_pose", 10, std::bind(&URTaskManager::sample_pose_change_cb, this, std::placeholders::_1));
@@ -24,20 +23,20 @@ rclcpp::node_interfaces::NodeBaseInterface::SharedPtr URTaskManager::getNodeBase
 void URTaskManager::create_nodes(){
 
   // Create a new object for the move group interface
-  // URTaskManager::move_group_interface_ = new MoveGroupInterface(node_, "ur_arm");
-  // URTaskManager::move_group_interface_->setEndEffector("right_finger");
+  URTaskManager::move_group_interface_ = new MoveGroupInterface(node_, "ur_arm");
+  URTaskManager::move_group_interface_->setEndEffector("right_finger");
 
-  // // Create a moveit visula tools related node
-  // URTaskManager::moveit_visual_tools_ =  new moveit_visual_tools::MoveItVisualTools{ node_, "ur_arm", 
-  //                 rviz_visual_tools::RVIZ_MARKER_TOPIC, URTaskManager::move_group_interface_->getRobotModel() };		
+  // Create a moveit visula tools related node
+  URTaskManager::moveit_visual_tools_ =  new moveit_visual_tools::MoveItVisualTools{ node_, "ur_arm", 
+                  rviz_visual_tools::RVIZ_MARKER_TOPIC, URTaskManager::move_group_interface_->getRobotModel() };		
 
-  // moveit_visual_tools::MoveItVisualTools env_visual(node_,"base_link", rviz_visual_tools::RVIZ_MARKER_TOPIC, URTaskManager::move_group_interface_->getRobotModel()); 
+  moveit_visual_tools::MoveItVisualTools env_visual(node_,"base_link", rviz_visual_tools::RVIZ_MARKER_TOPIC, URTaskManager::move_group_interface_->getRobotModel()); 
 
-  // URTaskManager::moveit_visual_tools_->loadRemoteControl();
+  URTaskManager::moveit_visual_tools_->loadRemoteControl();
   
-  // URTaskManager::jmg_ = URTaskManager::move_group_interface_->getRobotModel()->getJointModelGroup("ur_arm");
+  URTaskManager::jmg_ = URTaskManager::move_group_interface_->getRobotModel()->getJointModelGroup("ur_arm");
 
-  // URTaskManager::planning_scene_interface = new moveit::planning_interface::PlanningSceneInterface() ;
+  URTaskManager::planning_scene_interface = new moveit::planning_interface::PlanningSceneInterface() ;
 
   URTaskManager::mtc_planner_node_ = new MTCPlanner(node_);
 

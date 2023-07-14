@@ -144,6 +144,7 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick)
             RCLCPP_INFO(LOGGER, "Inside pick_overarm::OVERARM_HOME ");  
             set_joint_goal("MOVE ARM HOME", rest_angles);
             task_executor();
+            gripper_close();
             arm_at_home = true ;
         }
         
