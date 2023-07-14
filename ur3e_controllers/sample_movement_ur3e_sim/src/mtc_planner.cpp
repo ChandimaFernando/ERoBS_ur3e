@@ -470,7 +470,7 @@ void MTCPlanner::top_approach(std::string take_name, std::string obj_to_pick){
     // Calculate distances to the target
     double obj_x = node_->get_parameter("objects." + obj_to_pick + ".x").as_double() ;
     double obj_y = node_->get_parameter("objects." + obj_to_pick + ".y").as_double() ;
-    double obj_z = node_->get_parameter("objects." + obj_to_pick + ".z").as_double() + hand_offset + 0.05 + 0.05;
+    double obj_z = node_->get_parameter("objects." + obj_to_pick + ".z").as_double() + hand_offset ;
 
 
     // Retrieve arm location in xyz
