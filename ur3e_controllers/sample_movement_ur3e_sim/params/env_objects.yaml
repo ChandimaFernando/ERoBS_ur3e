@@ -9,7 +9,7 @@ ur_task_manager:
         r: 0.02 # radius
         x: 0.0
         y: 0.4
-        z: 0.05
+        z: 0.01
       sample2:
         type: 'CYLINDER'
         h: 0.1 # height
@@ -43,7 +43,7 @@ ur_task_manager:
 #      underarm_turn_angels: [-2.99, -2.25217287,  -1.6051793, -2.36996786, -1.5892968] # The order of the angles has to be changes if the current results in collisions
       top_pre_pick: [-4.25302, -1.61251, -1.55614, -1.52612, 1.54078, 0.07278]
       top_pre_place: [-0.60161, -1.61251, -1.55614, -1.52612, 1.54078, 0.07278] 
-      hand_offset: 0.1
+      hand_offset: 0.155
       base_frame: 'base_link'
       eef_frame: 'flange'
       finger_offset_x: 0.0

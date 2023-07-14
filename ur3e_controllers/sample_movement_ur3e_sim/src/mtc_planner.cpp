@@ -129,6 +129,8 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick)
 
     std::chrono::nanoseconds sleep_time = 3000ms ;
     rclcpp::sleep_for(sleep_time);
+    gripper_open();
+    rclcpp::sleep_for(sleep_time);
 
     top_approach("TOP APPROACH PICK", obj_to_pick);
      rclcpp::sleep_for(sleep_time);
