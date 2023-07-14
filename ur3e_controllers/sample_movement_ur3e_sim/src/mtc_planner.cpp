@@ -195,7 +195,6 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick)
     case pick_overarm::OVERARM_RETURNED:
         RCLCPP_INFO(LOGGER, "Inside pick_overarm::OVERARM_RETURNED ");  
  
- 
         rclcpp::sleep_for(sleep_time);
         gripper_open();
         rclcpp::sleep_for(sleep_time);
