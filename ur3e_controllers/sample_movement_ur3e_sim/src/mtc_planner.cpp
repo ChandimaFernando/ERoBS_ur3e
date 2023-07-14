@@ -155,12 +155,19 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick)
         RCLCPP_INFO(LOGGER, "Inside pick_overarm::OVERARM_PICK ");  
         set_joint_goal("TOP PRE PICK", top_pre_pick_angles);
         task_executor();
-        top_approach("TOP APPROACH PICK", obj_to_pick);
+
+        gripper_open();
+        gripper_close();
+
+
+
+
+/*     top_approach("TOP APPROACH PICK", obj_to_pick);
         // task_executor();
         // // Close the gripper here
         top_retreat("TOP RETREAT");
         // task_executor();
-
+*/
         // pick_overarm_enum_value = pick_overarm::OVERARM_PLACE ;
         break;
 
@@ -168,16 +175,30 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick)
         RCLCPP_INFO(LOGGER, "Inside pick_overarm::OVERARM_PLACE ");  
         set_joint_goal("TOP PRE PLCE", top_pre_place_angles);
         task_executor();
-        top_approach("TOP APPROACH PLACE", "target");
+
+        gripper_open();
+        gripper_close();
+        
+     /*   top_approach("TOP APPROACH PLACE", "target");
         // Open the gripper here
-        top_retreat("TOP RETREAT");
+        top_retreat("TOP RETREAT"); */
 
         // pick_overarm_enum_value = pick_overarm::OVERARM_RETURNED ;
         break;
 
     case pick_overarm::OVERARM_RETURNED:
         RCLCPP_INFO(LOGGER, "Inside pick_overarm::OVERARM_RETURNED ");  
-        top_approach("TOP APPROACH RETURN", "target");
+ 
+ 
+        gripper_open();
+        gripper_close();
+        set_joint_goal("TOP PRE RETURN", top_pre_pick_angles);
+
+        gripper_open();
+        gripper_close();
+ 
+        set_joint_goal("MOVE ARM HOME", rest_angles);
+ /*       top_approach("TOP APPROACH RETURN", "target");
         task_executor();
         // close the gripper here
         top_retreat("TOP RETREAT");
@@ -190,7 +211,7 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick)
         set_joint_goal("MOVE ARM HOME", rest_angles);
         task_executor();  
         arm_at_home = true ;
-
+*/
         // pick_overarm_enum_value = pick_overarm::OVERARM_HOME ;
 
     default:

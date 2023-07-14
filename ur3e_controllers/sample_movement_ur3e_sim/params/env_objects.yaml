@@ -36,13 +36,13 @@ ur_task_manager:
         y: 0.0 # pose y
         z: -0.01 # pose z
     ur3e:
-      joint_names: ['shoulder_pan_joint' , 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint']
+      joint_names: ['shoulder_pan_joint' , 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
       # rest_angels: [-1.600699, -1.4477506, -1.7994345, -1.4871951, 1.595100] #[shoulder_pan_joint, shoulder_lift_joint, elbow_joint, wrist_1_joint, wrist_2_joint]
-      rest_angels: [-3.13129, -1.61251, -1.55614, -1.41564, 1.54078] #For real robot
-      underarm_turn_angels: [-1.600699 , -2.25217287,  -1.6051793, -2.36996786, -1.5892968] # The order of the angles has to be changes if the current results in collisions
+      rest_angels: [-3.13129, -1.61251, -1.55614, -1.52612, 1.54078, 0.07278] #For real robot
+      underarm_turn_angels: [-1.600699 , -2.25217287,  -1.6051793, -2.36996786, -1.5892968, 0.07278] # The order of the angles has to be changes if the current results in collisions
 #      underarm_turn_angels: [-2.99, -2.25217287,  -1.6051793, -2.36996786, -1.5892968] # The order of the angles has to be changes if the current results in collisions
-      top_pre_pick: [-2.99, -1.4477506, -1.7994345, -1.4871951, 1.595100]
-      top_pre_place: [0.00, -1.4477506, -1.7994345, -1.4871951, 1.595100] 
+      top_pre_pick: [-4.25302, -1.61251, -1.55614, -1.52612, 1.54078, 0.07278]
+      top_pre_place: [-0.60161, -1.61251, -1.55614, -1.52612, 1.54078, 0.07278] 
       hand_offset: 0.1
       base_frame: 'base_link'
       eef_frame: 'flange'
