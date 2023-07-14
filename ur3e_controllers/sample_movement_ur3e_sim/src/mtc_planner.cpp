@@ -84,45 +84,6 @@ void MTCPlanner::task_executor(){
 
 }
 
-/*
-void MTCPlanner::test_pick(std::string obj_to_pick)
-{
-
-    // Retreive the length of the gripper
-    double hand_offset = node_->get_parameter("ur3e.hand_offset").as_double();
-
-    // Calculate distances to the target
-    double obj_x = node_->get_parameter("objects." + obj_to_pick + ".x").as_double() ;
-    double obj_y = node_->get_parameter("objects." + obj_to_pick + ".y").as_double() ;
-    double obj_z = node_->get_parameter("objects." + obj_to_pick + ".z").as_double() ;
-
-
-    // Retrieve arm location in xyz
-    geometry_msgs::msg::PoseStamped arm_pose ;
-    arm_pose = MTCPlanner::get_eef_pose();
-
-    // MTCPlanner::arm_top_approach_dists.pose.position.x =  obj_x - (arm_pose.pose.position.x - finger_offset_x) ;
-    // MTCPlanner::arm_top_approach_dists.pose.position.y =  obj_y - (arm_pose.pose.position.y + finger_offset_y) ;
-    // MTCPlanner::arm_top_approach_dists.pose.position.z =  obj_z - (arm_pose.pose.position.z + finger_offset_z) ;
-
-    MTCPlanner::arm_top_approach_dists.pose.position.x =  obj_x - finger_offset_x ;
-    MTCPlanner::arm_top_approach_dists.pose.position.y =  obj_y - finger_offset_y ;
-    MTCPlanner::arm_top_approach_dists.pose.position.z =  obj_z + finger_offset_z + hand_offset;    
-
-    RCLCPP_INFO(LOGGER, "obj_x : %f ", obj_x );  
-    RCLCPP_INFO(LOGGER, "obj_y : %f ", obj_y );  
-    RCLCPP_INFO(LOGGER, "obj_z : %f ", obj_z );  
-
-    RCLCPP_INFO(LOGGER, "arm_pose.pose.position.x : %f ", arm_pose.pose.position.x );  
-    RCLCPP_INFO(LOGGER, "arm_pose.pose.position.y : %f ", arm_pose.pose.position.y );  
-    RCLCPP_INFO(LOGGER, "arm_pose.pose.position.z : %f ", arm_pose.pose.position.z );  
-
-    RCLCPP_INFO(LOGGER, "MTCPlanner::arm_top_approach_dists.pose.position.x : %f ", MTCPlanner::arm_top_approach_dists.pose.position.x  );  
-    RCLCPP_INFO(LOGGER, "MTCPlanner::arm_top_approach_dists.pose.position.y : %f ", MTCPlanner::arm_top_approach_dists.pose.position.y  );  
-    RCLCPP_INFO(LOGGER, "MTCPlanner::arm_top_approach_dists.pose.position.z : %f ", MTCPlanner::arm_top_approach_dists.pose.position.z  );  
-
-
-}*/
 
 void MTCPlanner::grab_from_top(std::string obj_to_pick)
 {
@@ -135,7 +96,7 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick)
     top_approach("TOP APPROACH PICK", obj_to_pick);
      rclcpp::sleep_for(sleep_time);
     // for (int i = static_cast<int>(pick_overarm::OVERARM_HOME) ; i <= static_cast<int>(pick_overarm::OVERARM_RETURNED) ; i++)
-    for (int i = 0 ; i < 0 ; i++)
+    for (int i = 0 ; i < 1 ; i++)
     {
         // pick_overarm pick_overarm_enum_value = pick_overarm::OVERARM_PICK ;
         pick_overarm pick_overarm_enum_value = static_cast<pick_overarm>(i);
@@ -162,14 +123,14 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick)
         RCLCPP_INFO(LOGGER, "Inside pick_overarm::OVERARM_PICK ");  
         set_joint_goal("TOP PRE PICK", top_pre_pick_angles);
         task_executor();
-
         rclcpp::sleep_for(sleep_time);
         gripper_open();
+        top_approach("TOP APPROACH PICK", obj_to_pick);
         rclcpp::sleep_for(sleep_time);
         gripper_close();
         rclcpp::sleep_for(sleep_time);
-
-
+        top_retreat("TOP RETREAT");
+        rclcpp::sleep_for(sleep_time);
 
 /*     top_approach("TOP APPROACH PICK", obj_to_pick);
         // task_executor();
@@ -184,9 +145,12 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick)
         RCLCPP_INFO(LOGGER, "Inside pick_overarm::OVERARM_PLACE ");  
         set_joint_goal("TOP PRE PLCE", top_pre_place_angles);
         task_executor();
-
+        rclcpp::sleep_for(sleep_time);
+        top_approach("TOP APPROACH PLACE", "target");
         rclcpp::sleep_for(sleep_time);
         gripper_open();
+        rclcpp::sleep_for(sleep_time);
+        top_retreat("TOP RETREAT");
         rclcpp::sleep_for(sleep_time);
         gripper_close();
         rclcpp::sleep_for(sleep_time);

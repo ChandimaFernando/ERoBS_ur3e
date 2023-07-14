@@ -7,8 +7,8 @@ ur_task_manager:
         type: 'CYLINDER'
         h: 0.1 # height
         r: 0.02 # radius
-        x: 0.0
-        y: 0.4
+        x: 0.22
+        y: -0.45
         z: 0.01
       sample2:
         type: 'CYLINDER'
@@ -23,9 +23,9 @@ ur_task_manager:
         d: 0.1 # depth
         h: 0.01 # height
         #w: 0.0 # pose, orientation 
-        x: -0.35 # pose x
-        y: 0.0 # pose y
-        z: 0.01 # pose z
+        x: -0.15 # pose x
+        y: 0.33 # pose y
+        z: 0.02 # pose z
       table:
         type: 'BOX'
         w: 2.0 # width
