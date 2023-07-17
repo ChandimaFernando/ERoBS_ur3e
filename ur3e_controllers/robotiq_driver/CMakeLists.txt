@@ -32,6 +32,8 @@ add_library(
   src/crc.cpp
   src/hardware_interface.cpp
   src/robotiq_gripper_interface.cpp
+  # src/gripper_open.cpp
+  # src/gripper_close.cpp
 )
 target_include_directories(
   ${PROJECT_NAME}
@@ -48,6 +50,10 @@ pluginlib_export_plugin_description_file(hardware_interface hardware_interface_p
 
 add_executable(gripper_interface_test src/gripper_interface_service.cpp)
 add_executable(gripper_cmds src/test_interface.cpp)
+add_executable(gripper_open src/gripper_open.cpp)
+add_executable(gripper_close src/gripper_close.cpp)
+
+
 
 #add_executable(gripper_interface_test src/gripper_interface_test.cpp)
 target_include_directories(gripper_interface_test PRIVATE include)
@@ -59,6 +65,13 @@ ament_target_dependencies(gripper_cmds serial custom_msgs)
 target_link_libraries(gripper_cmds ${PROJECT_NAME})
 
 
+target_include_directories(gripper_open PRIVATE include)
+ament_target_dependencies(gripper_open serial custom_msgs)
+target_link_libraries(gripper_open ${PROJECT_NAME})
+
+target_include_directories(gripper_close PRIVATE include)
+ament_target_dependencies(gripper_close serial custom_msgs)
+target_link_libraries(gripper_close ${PROJECT_NAME})
 # INSTALL
 install(
   TARGETS ${PROJECT_NAME}
@@ -68,7 +81,7 @@ install(
   RUNTIME DESTINATION bin
 )
 install(
-  TARGETS gripper_interface_test gripper_cmds
+  TARGETS gripper_interface_test gripper_cmds gripper_close gripper_open
 
   DESTINATION lib/${PROJECT_NAME}
 )
