@@ -44,7 +44,7 @@ void URTaskManager::create_nodes(){
 
   URTaskManager::mtc_planner_node_ = new MTCPlanner(node_);
 
-  mtc_planner_node_->grab_from_top("sample1", 0 , 0);
+  mtc_planner_node_->grab_from_top("sample1", 0 , 3);
   
 
 }
