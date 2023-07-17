@@ -151,9 +151,15 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick, int start_stage, int end
         rclcpp::sleep_for(sleep_time);
         gripper_close();
         rclcpp::sleep_for(sleep_time);
-     /*   top_approach("TOP APPROACH PLACE", "target");
-        // Open the gripper here
-        top_retreat("TOP RETREAT"); */
+
+        // Next set of lines are to retreat the placed sample
+        gripper_open();
+        rclcpp::sleep_for(sleep_time);
+        top_approach("TOP APPROACH PLACE", "target");
+        rclcpp::sleep_for(sleep_time);
+        gripper_close();
+        rclcpp::sleep_for(sleep_time);
+        top_retreat("TOP RETREAT");
 
         // pick_overarm_enum_value = pick_overarm::OVERARM_RETURNED ;
         break;
@@ -162,15 +168,14 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick, int start_stage, int end
         RCLCPP_INFO(LOGGER, "Inside pick_overarm::OVERARM_RETURNED ");  
  
         rclcpp::sleep_for(sleep_time);
-        gripper_open();
-        rclcpp::sleep_for(sleep_time);
-        gripper_close();
-        rclcpp::sleep_for(sleep_time);
         set_joint_goal("TOP PRE RETURN", top_pre_pick_angles);
         task_executor();
-
+        rclcpp::sleep_for(sleep_time);
+        top_approach("TOP APPROACH PICK", obj_to_pick);
         rclcpp::sleep_for(sleep_time);
         gripper_open();
+        rclcpp::sleep_for(sleep_time);
+        top_retreat("TOP RETREAT");
         rclcpp::sleep_for(sleep_time);
         gripper_close();
         rclcpp::sleep_for(sleep_time);
