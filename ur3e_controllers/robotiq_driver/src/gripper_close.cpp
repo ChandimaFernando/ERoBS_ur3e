@@ -14,13 +14,13 @@ int main(int argc, char **argv)
   rclcpp::init(argc, argv);
 
 
-  std::shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared("gpr_intfc_open");
+  std::shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared("gpr_intfc_close");
 
   rclcpp::Client<custom_msgs::srv::GripperCmd>::SharedPtr client = node->create_client<custom_msgs::srv::GripperCmd>("gripper_service");
 
   auto request = std::make_shared<custom_msgs::srv::GripperCmd::Request>();
   request->grip = 10 ;
-  request->cmd = 'O' ;
+  request->cmd = 'C' ;
 
   while (!client->wait_for_service(1s)) {
     if (!rclcpp::ok()) {

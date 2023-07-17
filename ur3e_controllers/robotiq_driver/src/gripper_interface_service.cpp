@@ -72,7 +72,7 @@ void gripper_controller(const std::shared_ptr<custom_msgs::srv::GripperCmd::Requ
         // std::cout << static_cast<int16_t>(request->grip) << std::endl ; 
         // std::cout << static_cast<int16_t>(val) << std::endl ; 
         gripper.setGripperPosition(val);
-        RCLCPP_INFO(rclcpp::get_logger("gripper_controller"), "Gripper Open");   
+        RCLCPP_INFO(rclcpp::get_logger("gripper_controller"), "Gripper Open at %d ", val);   
       }
       break;
 
@@ -85,7 +85,7 @@ void gripper_controller(const std::shared_ptr<custom_msgs::srv::GripperCmd::Requ
     case 'C':
       /* Close the grippper fully */
       gripper.setGripperPosition(0xFF);
-      RCLCPP_INFO(rclcpp::get_logger("gripper_controller"), "Gripper Open");   
+      RCLCPP_INFO(rclcpp::get_logger("gripper_controller"), "Gripper Close");   
       break;
 
     // case 'S':

@@ -35,7 +35,7 @@ class MTCPlanner
         void initialize();
         /// @brief State machine equivalent of picking from top
         /// @param obj_to_pick 
-        void grab_from_top(std::string obj_to_pick);
+        void grab_from_top(std::string obj_to_pick, int start_stage, int end_stage);
         /// @brief State machine equivalent of picking from under arm
         /// @param obj_to_pick 
         void grab_from_side(std::string obj_to_pick);

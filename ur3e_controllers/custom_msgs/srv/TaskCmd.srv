@@ -1,0 +1,4 @@
+int8 start_stage
+int8 end_stage
+---
+bool status

@@ -16,6 +16,8 @@
 
 #include <geometry_msgs/msg/pose.h>
 #include "sample_movement_ur3e_sim/mtc_planner.hpp"
+// #include "custom_msgs/srv/task_cmd.hpp"
+
 
 class URTaskManager
 {
@@ -57,6 +59,8 @@ class URTaskManager
     /// @brief Callback subscriber 
     rclcpp::Subscription<geometry_msgs::msg::Pose>::SharedPtr subscription_;
 
+    // rclcpp::Service<custom_msgs::srv::TaskCmd>::SharedPtr task_service_ ;
+
     /// @brief  This function initializes all the necessory objects and variables. This is called from the constructor 
     void create_nodes();
     /// @brief  This draws the robot trajectory in RViz 
@@ -65,6 +69,10 @@ class URTaskManager
     /// @brief This callback changes parameter stack and recreate the env
     /// @param msg 
     void sample_pose_change_cb(const geometry_msgs::msg::Pose::SharedPtr msg) ; 
+
+    // void create_services();
+    // void create_services(const std::shared_ptr<custom_msgs::srv::TaskCmd::Request> request, std::shared_ptr<custom_msgs::srv::TaskCmd::Response> response);
+
 
 // = rclcpp::get_logger("ur_task_manager");
 

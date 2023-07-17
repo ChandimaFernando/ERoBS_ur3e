@@ -85,14 +85,14 @@ void MTCPlanner::task_executor(){
 }
 
 
-void MTCPlanner::grab_from_top(std::string obj_to_pick)
+void MTCPlanner::grab_from_top(std::string obj_to_pick, int start_stage, int end_stage)
 {
 
     std::chrono::nanoseconds sleep_time = 3000ms ;
     rclcpp::sleep_for(sleep_time);
 
     // for (int i = static_cast<int>(pick_overarm::OVERARM_HOME) ; i <= static_cast<int>(pick_overarm::OVERARM_RETURNED) ; i++)
-    for (int i = 0 ; i <= 1 ; i++)
+    for (int i = start_stage ; i <= end_stage ; i++)
     {
         // pick_overarm pick_overarm_enum_value = pick_overarm::OVERARM_PICK ;
         pick_overarm pick_overarm_enum_value = static_cast<pick_overarm>(i);

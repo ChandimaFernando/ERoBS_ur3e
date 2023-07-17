@@ -1,4 +1,5 @@
 #include "sample_movement_ur3e_sim/ur_task_manager.hpp"
+// #include "ur_task_manager.hpp"
 
 using moveit::planning_interface::MoveGroupInterface;
 
@@ -11,6 +12,9 @@ URTaskManager::URTaskManager(const rclcpp::NodeOptions& options)
   subscription_ = node_->create_subscription<geometry_msgs::msg::Pose>(
       "sample_pose", 10, std::bind(&URTaskManager::sample_pose_change_cb, this, std::placeholders::_1));
   
+
+  // URTaskManager::task_service_ = node_->create_service<custom_msgs::srv::TaskCmd>(
+  //   "ur_task_service",  &URTaskManager::create_services);   // CHANGE
 
 }  
 
@@ -40,7 +44,7 @@ void URTaskManager::create_nodes(){
 
   URTaskManager::mtc_planner_node_ = new MTCPlanner(node_);
 
-  mtc_planner_node_->grab_from_top("sample1");
+  mtc_planner_node_->grab_from_top("sample1", 0 , 0);
   
 
 }
@@ -130,6 +134,13 @@ void URTaskManager::sample_pose_change_cb(const geometry_msgs::msg::Pose::Shared
   // Call to re-draw the env
   create_env();
 }
+
+// void URTaskManager::create_services(const std::shared_ptr<custom_msgs::srv::TaskCmd::Request> request, std::shared_ptr<custom_msgs::srv::TaskCmd::Response> response)
+// {
+
+
+// }
+
 
 int main(int argc, char *argv[])
 {
