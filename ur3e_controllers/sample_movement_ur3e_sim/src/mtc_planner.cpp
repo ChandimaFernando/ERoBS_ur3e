@@ -129,12 +129,6 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick, int start_stage, int end
         top_retreat("TOP RETREAT");
         rclcpp::sleep_for(sleep_time);
 
-/*     top_approach("TOP APPROACH PICK", obj_to_pick);
-        // task_executor();
-        // // Close the gripper here
-        top_retreat("TOP RETREAT");
-        // task_executor();
-*/
         // pick_overarm_enum_value = pick_overarm::OVERARM_PLACE ;
         break;
 
@@ -207,12 +201,12 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick, int start_stage, int end
 }
 
 
-void MTCPlanner::grab_from_side(std::string obj_to_pick){
+void MTCPlanner::grab_from_side(std::string obj_to_pick, int start_stage, int end_stage){
 
     std::chrono::nanoseconds sleep_time = 3000ms ;
     rclcpp::sleep_for(sleep_time);
 
-    for (int i = 0 ; i <= 0; i++)
+    for (int i = start_stage ; i <= end_stage; i++)
     {
         pick_underarm pick_underarm_enum_value = static_cast<pick_underarm>(i);
         // pick_underarm pick_underarm_enum_value = pick_underarm::UNDERARM_HOME ;
@@ -221,13 +215,16 @@ void MTCPlanner::grab_from_side(std::string obj_to_pick){
     {
     case pick_underarm::UNDERARM_HOME:
         if(!arm_at_home){
-            // move_arm_home();
+            gripper_open();
+            rclcpp::sleep_for(sleep_time);
             set_joint_goal("MOVE ARM HOME", rest_angles);
             task_executor();
+            rclcpp::sleep_for(sleep_time);
+
             arm_at_home = true ;
         }
         
-        pick_underarm_enum_value = pick_underarm::UNDERARM_TURN;
+        // pick_underarm_enum_value = pick_underarm::UNDERARM_TURN;
         break;
     
     case pick_underarm::UNDERARM_TURN:
@@ -235,7 +232,7 @@ void MTCPlanner::grab_from_side(std::string obj_to_pick){
         set_joint_goal("UNDERARM PRE PICK", underarm_turn_angels);
         task_executor();
 
-        pick_underarm_enum_value = pick_underarm::UNDERARM_PICK ;
+        // pick_underarm_enum_value = pick_underarm::UNDERARM_PICK ;
         break;
 
     case pick_underarm::UNDERARM_PICK:
@@ -245,7 +242,7 @@ void MTCPlanner::grab_from_side(std::string obj_to_pick){
         underarm_retreat("UNDERARM RETREAT", obj_to_pick);
         task_executor();
 
-        pick_underarm_enum_value = pick_underarm::UNDERARM_PLACE ;
+        // pick_underarm_enum_value = pick_underarm::UNDERARM_PLACE ;
         break;
 
     case pick_underarm::UNDERARM_PLACE:

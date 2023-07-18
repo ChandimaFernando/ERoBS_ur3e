@@ -71,7 +71,7 @@ class URTaskManager
     void sample_pose_change_cb(const geometry_msgs::msg::Pose::SharedPtr msg) ; 
 
     // void create_services();
-    // void create_services(const std::shared_ptr<custom_msgs::srv::TaskCmd::Request> request, std::shared_ptr<custom_msgs::srv::TaskCmd::Response> response);
+    // void create_services(const custom_msgs::srv::TaskCmd::Request::SharedPtr request, const custom_msgs::srv::TaskCmd::Response::SharedPtr response);
 
 
 // = rclcpp::get_logger("ur_task_manager");

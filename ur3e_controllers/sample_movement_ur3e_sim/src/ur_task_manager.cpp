@@ -1,5 +1,4 @@
 #include "sample_movement_ur3e_sim/ur_task_manager.hpp"
-// #include "ur_task_manager.hpp"
 
 using moveit::planning_interface::MoveGroupInterface;
 
@@ -13,8 +12,7 @@ URTaskManager::URTaskManager(const rclcpp::NodeOptions& options)
       "sample_pose", 10, std::bind(&URTaskManager::sample_pose_change_cb, this, std::placeholders::_1));
   
 
-  // URTaskManager::task_service_ = node_->create_service<custom_msgs::srv::TaskCmd>(
-  //   "ur_task_service",  &URTaskManager::create_services);   // CHANGE
+  // auto task_service_ = node_->create_service<custom_msgs::srv::TaskCmd>( "ur_task_service",  &URTaskManager::create_services); 
 
 }  
 
@@ -45,7 +43,8 @@ void URTaskManager::create_nodes(){
   URTaskManager::mtc_planner_node_ = new MTCPlanner(node_);
 
 
-  mtc_planner_node_->grab_from_top("sample1", 0 , 3);
+  // mtc_planner_node_->grab_from_top("sample1", 0 , 3);
+  mtc_planner_node_->grab_from_side("sample2", 0, 1);
     // mtc_planner_node_->grab_from_top("sample1", 0 , 0); // Go to rest location
     // mtc_planner_node_->grab_from_top("sample1", 0 , 3); // From rest -> pick up -> place -> back to rest 
 
@@ -170,5 +169,9 @@ int main(int argc, char *argv[])
   return 0;
 }
 
+// double curve_extension_xy = node->get_parameter("curve_extension_xy").as_double();
+// void URTaskManager::create_services(const custom_msgs::srv::TaskCmd::Request::SharedPtr request, const custom_msgs::srv::TaskCmd::Response::SharedPtr response)
+// {
+// }
 
-  // double curve_extension_xy = node->get_parameter("curve_extension_xy").as_double();
+// void URTaskManager::create_services(){}
