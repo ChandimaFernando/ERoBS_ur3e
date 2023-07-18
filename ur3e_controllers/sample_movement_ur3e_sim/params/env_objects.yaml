@@ -15,7 +15,7 @@ ur_task_manager:
         h: 0.1 # height
         r: 0.02 # radius
         x: 0.45
-        y: -0.0
+        y: -0.36
         z: 0.05
       target:
         type: 'BOX'
@@ -24,8 +24,8 @@ ur_task_manager:
         h: 0.01 # height
         #w: 0.0 # pose, orientation 
         x: -0.15 # pose x
-        y: 0.33 # pose y
-        z: 0.02 # pose z
+        y: 0.34 # pose y
+        z: 0.04 # pose z
       table:
         type: 'BOX'
         w: 2.0 # width
@@ -41,8 +41,9 @@ ur_task_manager:
       rest_angels: [-3.13129, -1.61251, -1.55614, -1.52612, 1.54078, 0.07278] #For real robot
       underarm_turn_angels: [-1.600699 , -2.25217287,  -1.6051793, -2.36996786, -1.5892968, 0.07278] # The order of the angles has to be changes if the current results in collisions
 #      underarm_turn_angels: [-2.99, -2.25217287,  -1.6051793, -2.36996786, -1.5892968] # The order of the angles has to be changes if the current results in collisions
-      top_pre_pick: [-4.25302, -1.61251, -1.55614, -1.52612, 1.54078, 0.68731066 ]
-      top_pre_place: [-0.60161, -1.61251, -1.55614, -1.52612, 1.54078, 0.07278] 
+#      underarm_pre_pick: [-3.8184312, -0.8011061, 1.6901768, -0.95137897, 3.0473448, 6.19644244]
+      top_pre_pick: [-4.27293, -1.61251, -1.55614, -1.52612, 1.54078, 0.39566614 ]
+      top_pre_place: [-0.8419468, -1.61251, -1.55614, -1.52612, 1.54078, 1.3796827] 
       hand_offset: 0.145
       base_frame: 'base_link'
       eef_frame: 'flange'
