@@ -152,18 +152,28 @@ void URTaskManager::create_services(const std::shared_ptr<custom_msgs::srv::Task
   // int start_stage = request->start_stage ;
   int end_stage = request->end_stage ;
 
+  std::cout << "************* "  << start_stage << std::endl ;
+  std::cout << "************* "  << task_number << std::endl ;
+  std::cout << "************* "  << end_stage << std::endl ;
+
+  bool status = false ;
+
   try
   {
     switch(task_number){
 
     case 1:
-      mtc_planner_node_->grab_from_top(sample_name, start_stage , end_stage);
+      std::cout <<  " $$$$$$ Stage 1 " << std::endl ;
+      URTaskManager::mtc_planner_node_ ->grab_from_top(sample_name, start_stage , end_stage);
+      status = true ;
       break ;
 
     case 2:
-      mtc_planner_node_->grab_from_side(sample_name, start_stage, end_stage);
+       URTaskManager::mtc_planner_node_ ->grab_from_side(sample_name, start_stage, end_stage);
+       status = true ;
 
     default:
+      status = false ;
       break;
 
   }
@@ -171,9 +181,11 @@ void URTaskManager::create_services(const std::shared_ptr<custom_msgs::srv::Task
   catch(const std::exception& e)
   {
     std::cerr << e.what() << '\n';
+    status = false ;
+
   }
 
-
+    response->status = status;
 
 
 }
