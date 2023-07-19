@@ -5,14 +5,15 @@ using moveit::planning_interface::MoveGroupInterface;
 URTaskManager::URTaskManager(const rclcpp::NodeOptions& options)
   : node_{ std::make_shared<rclcpp::Node>("ur_task_manager", options) }
 {
-  create_nodes();
-  create_env();
+
 
   subscription_ = node_->create_subscription<geometry_msgs::msg::Pose>(
       "sample_pose", 10, std::bind(&URTaskManager::sample_pose_change_cb, this, std::placeholders::_1));
   
+  URTaskManager::task_service_ = node_->create_service<custom_msgs::srv::TaskCmd>( "ur_task_service",  std::bind(&URTaskManager::create_services, this, std::placeholders::_1, std::placeholders::_2) ); 
 
-  auto task_service_ = node_->create_service<custom_msgs::srv::TaskCmd>( "ur_task_service",  std::bind(&URTaskManager::create_services, this, std::placeholders::_1, std::placeholders::_2) ); 
+  create_nodes();
+  create_env();
 
 // std::bind(URTaskManager::create_services, this, std::placeholders::_1, std::placeholders::_2));
 

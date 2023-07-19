@@ -59,7 +59,7 @@ class URTaskManager
     /// @brief Callback subscriber 
     rclcpp::Subscription<geometry_msgs::msg::Pose>::SharedPtr subscription_;
 
-    // rclcpp::Service<custom_msgs::srv::TaskCmd>::SharedPtr task_service_ ;
+    rclcpp::Service<custom_msgs::srv::TaskCmd>::SharedPtr task_service_ ;
 
     /// @brief  This function initializes all the necessory objects and variables. This is called from the constructor 
     void create_nodes();
