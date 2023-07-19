@@ -237,8 +237,10 @@ void MTCPlanner::grab_from_side(std::string obj_to_pick, int start_stage, int en
 
     case pick_underarm::UNDERARM_PICK:
         underarm_approach("UNDERARM APPROACH PICK", obj_to_pick);
-        task_executor();
         // Close the gripper here
+	task_executor();
+	rclcpp::sleep_for(sleep_time);
+	gripper_close();
         underarm_retreat("UNDERARM RETREAT", obj_to_pick);
         task_executor();
 

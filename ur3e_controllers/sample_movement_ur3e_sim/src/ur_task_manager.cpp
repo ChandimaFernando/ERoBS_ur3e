@@ -44,7 +44,7 @@ void URTaskManager::create_nodes(){
 
 
   // mtc_planner_node_->grab_from_top("sample1", 0 , 3);
-  mtc_planner_node_->grab_from_side("sample2", 0, 1);
+  mtc_planner_node_->grab_from_side("sample2", 0, 2);
     // mtc_planner_node_->grab_from_top("sample1", 0 , 0); // Go to rest location
     // mtc_planner_node_->grab_from_top("sample1", 0 , 3); // From rest -> pick up -> place -> back to rest 
 
