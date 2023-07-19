@@ -152,10 +152,6 @@ void URTaskManager::create_services(const std::shared_ptr<custom_msgs::srv::Task
   // int start_stage = request->start_stage ;
   int end_stage = request->end_stage ;
 
-  std::cout << "************* "  << start_stage << std::endl ;
-  std::cout << "************* "  << task_number << std::endl ;
-  std::cout << "************* "  << end_stage << std::endl ;
-
   bool status = false ;
 
   try
@@ -164,12 +160,12 @@ void URTaskManager::create_services(const std::shared_ptr<custom_msgs::srv::Task
 
     case 1:
       std::cout <<  " $$$$$$ Stage 1 " << std::endl ;
-      URTaskManager::mtc_planner_node_ ->grab_from_top(sample_name, start_stage , end_stage);
+      URTaskManager::mtc_planner_node_->grab_from_top(sample_name, start_stage , end_stage);
       status = true ;
       break ;
 
     case 2:
-       URTaskManager::mtc_planner_node_ ->grab_from_side(sample_name, start_stage, end_stage);
+       URTaskManager::mtc_planner_node_->grab_from_side(sample_name, start_stage, end_stage);
        status = true ;
 
     default:
