@@ -160,7 +160,7 @@ void URTaskManager::create_services(const std::shared_ptr<custom_msgs::srv::Task
       break ;
 
     case 2:
-      mtc_planner_node_->grab_from_side("sample2", start_stage, end_stage);
+      mtc_planner_node_->grab_from_side(sample_name, start_stage, end_stage);
 
     default:
       break;
