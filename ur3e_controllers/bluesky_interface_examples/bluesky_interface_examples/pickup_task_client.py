@@ -28,8 +28,13 @@ class TaskClient(Node):
 def main():
     rclpy.init()
 
+    task_number = 1 # 1 for over arm , 2 for under arm
+    sample_name = "sample1"   # this matches the sample you wanna grab ( locations are in the env_objects.yaml file)
+    start_stage = 0 
+    stop_stage = 1 
+
     task_client = TaskClient()
-    response = task_client.send_request(int(sys.argv[1]), str(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]) )
+    response = task_client.send_request(task_number, sample_name, start_stage, stop_stage)
     task_client.get_logger().info(
         'Result of add_two_ints: for %d + %d = %d' %
         (int(sys.argv[1]), int(sys.argv[2]), response.sum))
