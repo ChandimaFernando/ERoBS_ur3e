@@ -35,9 +35,6 @@ def main():
 
     task_client = TaskClient()
     response = task_client.send_request(task_number, sample_name, start_stage, stop_stage)
-    task_client.get_logger().info(
-        'Result of add_two_ints: for %d + %d = %d' %
-        (int(sys.argv[1]), int(sys.argv[2]), response.sum))
 
     task_client.destroy_node()
     rclpy.shutdown()
