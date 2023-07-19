@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'pickup_task_client = bluesky_interface_examples.client_member_function:main',
+            'pickup_task_client = bluesky_interface_examples.pickup_task_client:main',
         ],
     },
 )
