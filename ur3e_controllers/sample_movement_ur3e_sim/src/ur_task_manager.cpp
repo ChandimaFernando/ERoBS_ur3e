@@ -6,7 +6,6 @@ URTaskManager::URTaskManager(const rclcpp::NodeOptions& options)
   : node_{ std::make_shared<rclcpp::Node>("ur_task_manager", options) }
 {
 
-
   subscription_ = node_->create_subscription<geometry_msgs::msg::Pose>(
       "sample_pose", 10, std::bind(&URTaskManager::sample_pose_change_cb, this, std::placeholders::_1));
   
@@ -45,10 +44,8 @@ void URTaskManager::create_nodes(){
   URTaskManager::planning_scene_interface = new moveit::planning_interface::PlanningSceneInterface() ;
 
   URTaskManager::mtc_planner_node_ = new MTCPlanner(node_);
-
-
-  mtc_planner_node_->grab_from_top("sample1", 0 , 1);
-  // mtc_planner_node_->grab_from_side("sample2", 0, 2);
+  // mtc_planner_node_->grab_from_top("sample1", 0 , 1);
+  mtc_planner_node_->grab_from_side("sample2", 0, 2);
     // mtc_planner_node_->grab_from_top("sample1", 0 , 0); // Go to rest location
     // mtc_planner_node_->grab_from_top("sample1", 0 , 3); // From rest -> pick up -> place -> back to rest 
 
