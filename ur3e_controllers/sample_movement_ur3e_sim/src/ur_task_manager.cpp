@@ -12,7 +12,10 @@ URTaskManager::URTaskManager(const rclcpp::NodeOptions& options)
       "sample_pose", 10, std::bind(&URTaskManager::sample_pose_change_cb, this, std::placeholders::_1));
   
 
-  // auto task_service_ = node_->create_service<custom_msgs::srv::TaskCmd>( "ur_task_service",  &URTaskManager::create_services); 
+  auto task_service_ = node_->create_service<custom_msgs::srv::TaskCmd>( "ur_task_service",  std::bind(&URTaskManager::create_services, this, std::placeholders::_1, std::placeholders::_2) ); 
+
+// std::bind(URTaskManager::create_services, this, std::placeholders::_1, std::placeholders::_2));
+
 
 }  
 
@@ -49,6 +52,7 @@ void URTaskManager::create_nodes(){
     // mtc_planner_node_->grab_from_top("sample1", 0 , 3); // From rest -> pick up -> place -> back to rest 
 
   
+
 
 }
 
@@ -138,11 +142,40 @@ void URTaskManager::sample_pose_change_cb(const geometry_msgs::msg::Pose::Shared
   create_env();
 }
 
-// void URTaskManager::create_services(const std::shared_ptr<custom_msgs::srv::TaskCmd::Request> request, std::shared_ptr<custom_msgs::srv::TaskCmd::Response> response)
-// {
+void URTaskManager::create_services(const std::shared_ptr<custom_msgs::srv::TaskCmd::Request> request, std::shared_ptr<custom_msgs::srv::TaskCmd::Response> response)
+{
+
+  int start_stage = request->start_stage ;
+  int task_number = request->task_number ;
+  std::string sample_name = request->sample_name ;
+  // int start_stage = request->start_stage ;
+  int end_stage = request->end_stage ;
+
+  try
+  {
+    switch(task_number){
+
+    case 1:
+      mtc_planner_node_->grab_from_top(sample_name, start_stage , end_stage);
+      break ;
+
+    case 2:
+      mtc_planner_node_->grab_from_side("sample2", start_stage, end_stage);
+
+    default:
+      break;
+
+  }
+  }
+  catch(const std::exception& e)
+  {
+    std::cerr << e.what() << '\n';
+  }
 
 
-// }
+
+
+}
 
 
 int main(int argc, char *argv[])

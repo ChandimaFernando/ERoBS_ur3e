@@ -70,6 +70,7 @@ class MTCPlanner
 
         /// @brief Records the distance the eef traveled to grab a sample / place at the target
         geometry_msgs::msg::PoseStamped arm_top_approach_dists ;
+        geometry_msgs::msg::PoseStamped under_arm_approach_dists ;
 
         // To compute transform coords
         std::shared_ptr<tf2_ros::TransformListener> tf_listener_{nullptr};
@@ -100,15 +101,18 @@ class MTCPlanner
         const std::string  hand_frame_ = "hand";    
 
         void move_arm_home();
-        void set_joint_goal(std::string take_name, std::vector<double> home_angel_list);
+        /// @brief Set joint values in ur3e from the base to wrist_3
+        /// @param task_name name of the task
+        /// @param home_angel_list list of angles from the param file
+        void set_joint_goal(std::string task_name, std::vector<double> home_angel_list);
         void move_arm_underarm();
         void side_pre_pick();
         void top_swipe();
-        void top_approach(std::string take_name, std::string obj_to_picks);
-        void top_retreat(std::string take_name) ;
+        void top_approach(std::string task_name, std::string obj_to_picks);
+        void top_retreat(std::string task_name) ;
 
-        void underarm_approach(std::string take_name, std::string obj_to_picks);
-        void underarm_retreat(std::string take_name, std::string obj_to_picks) ;
+        void underarm_approach(std::string task_name, std::string obj_to_picks);
+        void underarm_retreat(std::string task_name, std::string obj_to_picks) ;
 
         geometry_msgs::msg::PoseStamped get_eef_pose();
 

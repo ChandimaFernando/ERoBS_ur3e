@@ -176,6 +176,7 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick, int start_stage, int end
 
         set_joint_goal("MOVE ARM HOME", rest_angles);
         task_executor();
+        break;
  /*       top_approach("TOP APPROACH RETURN", "target");
         task_executor();
         // close the gripper here
@@ -229,7 +230,7 @@ void MTCPlanner::grab_from_side(std::string obj_to_pick, int start_stage, int en
     
     case pick_underarm::UNDERARM_TURN:
 
-        set_joint_goal("UNDERARM PRE PICK", underarm_turn_angels);
+        set_joint_goal("UNDERARM_POSE", underarm_turn_angels);
         task_executor();
 
         // pick_underarm_enum_value = pick_underarm::UNDERARM_PICK ;
@@ -285,10 +286,10 @@ void MTCPlanner::grab_from_side(std::string obj_to_pick, int start_stage, int en
 }
 
 
-void MTCPlanner::set_joint_goal(std::string take_name, std::vector<double> home_angel_list){
+void MTCPlanner::set_joint_goal(std::string task_name, std::vector<double> home_angel_list){
 
     MTCPlanner::task_.clear();
-    MTCPlanner::task_.stages()->setName(take_name);
+    MTCPlanner::task_.stages()->setName(task_name);
     MTCPlanner::task_.loadRobotModel(node_);
 
     MTCPlanner::task_.setProperty("group", arm_group_name_);
@@ -317,67 +318,205 @@ void MTCPlanner::set_joint_goal(std::string take_name, std::vector<double> home_
     MTCPlanner::task_.add(std::move(stage_state_current));
 
     int num_joints = MTCPlanner::joint_names.size();
-    for (int i = 0; i < num_joints ; i++){
-        {
-            std::map<std::string, double> init_arm_pose{{joint_names[i], home_angel_list[i]}};
-            
-            auto stage_pose = std::make_unique<moveit::task_constructor::stages::MoveTo>("move"+joint_names[i], interpolation_planner);
-            stage_pose->setGroup(arm_group_name_);
-            stage_pose->setGoal(init_arm_pose);
-            MTCPlanner::task_.add(std::move(stage_pose));
-        }
 
-    }
+    // if(task_name == "UNDERARM_POSE"){
+
+    //   int order [6] = { 5, 3, 2, 1, 4, 6 };
+    //   for (int i = 0; i < num_joints ; i++){
+    //       {
+    //           std::map<std::string, double> init_arm_pose{{joint_names[order[i]], home_angel_list[order[i]]}};
+              
+    //           auto stage_pose = std::make_unique<moveit::task_constructor::stages::MoveTo>("move"+joint_names[order[i]], interpolation_planner);
+    //           stage_pose->setGroup(arm_group_name_);
+    //           stage_pose->setGoal(init_arm_pose);
+    //           MTCPlanner::task_.add(std::move(stage_pose));
+    //       }
+
+    //   }
+
+    // }
+    // else{
+
+      for (int i = 0; i < num_joints ; i++){
+          {
+              std::map<std::string, double> init_arm_pose{{joint_names[i], home_angel_list[i]}};
+              
+              auto stage_pose = std::make_unique<moveit::task_constructor::stages::MoveTo>("move"+joint_names[i], interpolation_planner);
+              stage_pose->setGroup(arm_group_name_);
+              stage_pose->setGoal(init_arm_pose);
+              MTCPlanner::task_.add(std::move(stage_pose));
+          }
+
+      }
+
+    // }
+
 }
 
-void MTCPlanner::underarm_approach(std::string take_name, std::string obj_to_pick)
+void MTCPlanner::underarm_approach(std::string task_name, std::string obj_to_pick)
 {
     // Retreive the length of the gripper
     double hand_offset = node_->get_parameter("ur3e.hand_offset").as_double();
+    double axis_tolarance = node_->get_parameter("ur3e.axis_tolarance").as_double();
 
     // Calculate distances to the target
     double obj_x = node_->get_parameter("objects." + obj_to_pick + ".x").as_double() ;
-    double obj_y = node_->get_parameter("objects." + obj_to_pick + ".y").as_double() ;
+    double obj_y = node_->get_parameter("objects." + obj_to_pick + ".y").as_double() + hand_offset;
     double obj_z = node_->get_parameter("objects." + obj_to_pick + ".z").as_double() ;
+
 
     // Retrieve arm location in xyz
     geometry_msgs::msg::PoseStamped arm_pose ;
     arm_pose = MTCPlanner::get_eef_pose();
 
-    MTCPlanner::arm_top_approach_dists.pose.position.x =  obj_x - finger_offset_x + hand_offset;
-    MTCPlanner::arm_top_approach_dists.pose.position.y =  obj_y - finger_offset_y ;
-    MTCPlanner::arm_top_approach_dists.pose.position.z =  obj_z + finger_offset_z ;    
+    MTCPlanner::under_arm_approach_dists.pose.position.x =  obj_x - (arm_pose.pose.position.x ) ;
+    MTCPlanner::under_arm_approach_dists.pose.position.y =  obj_y - (arm_pose.pose.position.y ) ;
+    MTCPlanner::under_arm_approach_dists.pose.position.z =  obj_z - (arm_pose.pose.position.z ) ;  
+
+    RCLCPP_INFO(LOGGER, "obj_x : %f ", obj_x );  
+    RCLCPP_INFO(LOGGER, "obj_y : %f ", obj_y );  
+    RCLCPP_INFO(LOGGER, "obj_z : %f ", obj_z );  
+
+    RCLCPP_INFO(LOGGER, "arm_pose.pose.position.x : %f ", arm_pose.pose.position.x );  
+    RCLCPP_INFO(LOGGER, "arm_pose.pose.position.y : %f ", arm_pose.pose.position.y );  
+    RCLCPP_INFO(LOGGER, "arm_pose.pose.position.z : %f ", arm_pose.pose.position.z );  
+
+    RCLCPP_INFO(LOGGER, "MTCPlanner::under_arm_approach_dists.pose.position.x : %f ", MTCPlanner::under_arm_approach_dists.pose.position.x  );  
+    RCLCPP_INFO(LOGGER, "MTCPlanner::under_arm_approach_dists.pose.position.y : %f ", MTCPlanner::under_arm_approach_dists.pose.position.y  );  
+    RCLCPP_INFO(LOGGER, "MTCPlanner::under_arm_approach_dists.pose.position.z : %f ", MTCPlanner::under_arm_approach_dists.pose.position.z  );  
+
 
     using moveit::planning_interface::MoveGroupInterface;
     auto move_group_interface = MoveGroupInterface(node_, "ur_arm");
-    move_group_interface.setEndEffectorLink(eff_name_);
+
+    double x_incs = (MTCPlanner::under_arm_approach_dists.pose.position.x)/2 ; 
+    double y_incs = (MTCPlanner::under_arm_approach_dists.pose.position.y)/2 ; 
+    double z_incs = (MTCPlanner::under_arm_approach_dists.pose.position.z)/2 ; 
 
   // Calculate the Bezier points
   std::vector<geometry_msgs::msg::Pose> waypoints;
+    geometry_msgs::msg::Pose intrm_pose ;
 
-    geometry_msgs::msg::Pose goal_pose;
-    goal_pose.position.x = MTCPlanner::arm_top_approach_dists.pose.position.x;
-    waypoints.push_back(goal_pose);
 
-    goal_pose.position.y = MTCPlanner::arm_top_approach_dists.pose.position.y ;
-    waypoints.push_back(goal_pose);
+    intrm_pose.position.x = arm_pose.pose.position.x ;
+    intrm_pose.position.y = arm_pose.pose.position.y ;
+    intrm_pose.position.z = arm_pose.pose.position.z ;
 
-    goal_pose.position.z = MTCPlanner::arm_top_approach_dists.pose.position.z ;
-    goal_pose.orientation = arm_pose.pose.orientation ;
-    waypoints.push_back(goal_pose);
+    intrm_pose.orientation.w = arm_pose.pose.orientation.w ;
+    intrm_pose.orientation.x = arm_pose.pose.orientation.x ;
+    intrm_pose.orientation.y = arm_pose.pose.orientation.y ;
+    intrm_pose.orientation.z = arm_pose.pose.orientation.z ;
 
+    // Add constraints
+    moveit_msgs::msg::OrientationConstraint ocm;
+    ocm.link_name = "wrist_3_link";
+    ocm.link_name = "flange";
+    ocm.header.frame_id = "base_link";
+    ocm.weight = 1.0;
+
+    ocm.absolute_x_axis_tolerance = axis_tolarance ;
+    ocm.absolute_y_axis_tolerance = axis_tolarance ;
+
+    ocm.orientation.w = arm_pose.pose.orientation.w ;
+    ocm.orientation.x = arm_pose.pose.orientation.x ;
+    ocm.orientation.y = arm_pose.pose.orientation.y ;
+    ocm.orientation.z = arm_pose.pose.orientation.z;
+
+    // Calculate linear intermediate points for x and y directions
+    for (double k = arm_pose.pose.position.z; std::abs(obj_z - k) > 0.00001; k += z_incs) {
+
+        intrm_pose.position.z = k ;
+
+        waypoints.push_back(intrm_pose);
+    }
+    
+    // Add the waypoints, including the final point
+    intrm_pose.position.y = obj_z ;
+    waypoints.push_back(intrm_pose);
+
+    // Execute the cartesian trajectory
     moveit_msgs::msg::RobotTrajectory trajectory;
     const double jump_threshold = 0.0;
-    const double eef_step = 0.001;
+    const double eef_step = 0.01;
+
+    moveit_msgs::msg::Constraints test_constraints;
+    test_constraints.orientation_constraints.push_back(ocm);
+    move_group_interface.setPathConstraints(test_constraints);
 
     move_group_interface.computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
-        
     move_group_interface.execute(trajectory);
+
+    std::chrono::nanoseconds sleep_time = 3000ms ;
+    rclcpp::sleep_for(sleep_time);
+
+    //clear the old waypoints
+    waypoints.clear();
+
+    // Do the same for z direction
+    // Calculate linear intermediate points for x and y directions
+    for (double i = arm_pose.pose.position.y, j = arm_pose.pose.position.x ; std::abs(obj_y - i) > 0.00001; i += y_incs, j += x_incs) {
+
+        intrm_pose.position.x = j ;
+        intrm_pose.position.y = i ;
+        RCLCPP_INFO(LOGGER, "intrm_pose.position.y : %f ", intrm_pose.position.y );  
+        RCLCPP_INFO(LOGGER, "std::abs(obj_y - i)  : %f ", std::abs(obj_y - i) );  
+
+        waypoints.push_back(intrm_pose);
+        break ;
+    }
+    
+    // Add the waypoints, including the final point
+    intrm_pose.position.y = obj_y ;
+    intrm_pose.position.x = obj_x ;
+    waypoints.push_back(intrm_pose);
+
+    move_group_interface.computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
+    move_group_interface.execute(trajectory);
+
+
+  //   // Calculate distances to the target
+  //   double obj_x = node_->get_parameter("objects." + obj_to_pick + ".x").as_double() ;
+  //   double obj_y = node_->get_parameter("objects." + obj_to_pick + ".y").as_double() ;
+  //   double obj_z = node_->get_parameter("objects." + obj_to_pick + ".z").as_double() ;
+
+  //   // Retrieve arm location in xyz
+  //   geometry_msgs::msg::PoseStamped arm_pose ;
+  //   arm_pose = MTCPlanner::get_eef_pose();
+
+  //   MTCPlanner::arm_top_approach_dists.pose.position.x =  obj_x - finger_offset_x + hand_offset;
+  //   MTCPlanner::arm_top_approach_dists.pose.position.y =  obj_y - finger_offset_y ;
+  //   MTCPlanner::arm_top_approach_dists.pose.position.z =  obj_z + finger_offset_z ;    
+
+  //   using moveit::planning_interface::MoveGroupInterface;
+  //   auto move_group_interface = MoveGroupInterface(node_, "ur_arm");
+  //   move_group_interface.setEndEffectorLink(eff_name_);
+
+  // // Calculate the Bezier points
+  // std::vector<geometry_msgs::msg::Pose> waypoints;
+
+  //   geometry_msgs::msg::Pose goal_pose;
+  //   goal_pose.position.x = MTCPlanner::arm_top_approach_dists.pose.position.x;
+  //   waypoints.push_back(goal_pose);
+
+  //   goal_pose.position.y = MTCPlanner::arm_top_approach_dists.pose.position.y ;
+  //   waypoints.push_back(goal_pose);
+
+  //   goal_pose.position.z = MTCPlanner::arm_top_approach_dists.pose.position.z ;
+  //   goal_pose.orientation = arm_pose.pose.orientation ;
+  //   waypoints.push_back(goal_pose);
+
+  //   moveit_msgs::msg::RobotTrajectory trajectory;
+  //   const double jump_threshold = 0.0;
+  //   const double eef_step = 0.001;
+
+  //   move_group_interface.computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
+        
+  //   move_group_interface.execute(trajectory);
 
 }
 
 
-void MTCPlanner::underarm_retreat(std::string take_name, std::string obj_to_pick)
+void MTCPlanner::underarm_retreat(std::string task_name, std::string obj_to_pick)
 {
     // Retreive the length of the gripper
     double hand_offset = node_->get_parameter("ur3e.hand_offset").as_double();
@@ -424,7 +563,7 @@ void MTCPlanner::underarm_retreat(std::string take_name, std::string obj_to_pick
 }
 
 
-void MTCPlanner::top_approach(std::string take_name, std::string obj_to_pick){
+void MTCPlanner::top_approach(std::string task_name, std::string obj_to_pick){
 
     // Retreive the length of the gripper
     double hand_offset = node_->get_parameter("ur3e.hand_offset").as_double();
@@ -546,7 +685,7 @@ void MTCPlanner::top_approach(std::string take_name, std::string obj_to_pick){
 
 }
 /*
-void MTCPlanner::top_approach(std::string take_name, std::string obj_to_pick){
+void MTCPlanner::top_approach(std::string task_name, std::string obj_to_pick){
 
     // Retreive the length of the gripper
     double hand_offset = node_->get_parameter("ur3e.hand_offset").as_double();
@@ -578,7 +717,7 @@ void MTCPlanner::top_approach(std::string take_name, std::string obj_to_pick){
     RCLCPP_INFO(LOGGER, "MTCPlanner::arm_top_approach_dists.pose.position.z : %f ", MTCPlanner::arm_top_approach_dists.pose.position.z  );  
 
     MTCPlanner::task_.clear();
-    MTCPlanner::task_.stages()->setName(take_name);
+    MTCPlanner::task_.stages()->setName(task_name);
     MTCPlanner::task_.loadRobotModel(node_);
     // auto ppp = task_.getRobotModel();
     // auto names = ppp->getLinkModelNames();
@@ -636,7 +775,7 @@ void MTCPlanner::top_approach(std::string take_name, std::string obj_to_pick){
 
 
 
-void MTCPlanner::top_retreat(std::string take_name){
+void MTCPlanner::top_retreat(std::string task_name){
     geometry_msgs::msg::PoseStamped arm_pose ;
     arm_pose = MTCPlanner::get_eef_pose();
 

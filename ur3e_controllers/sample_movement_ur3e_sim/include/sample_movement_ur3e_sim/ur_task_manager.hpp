@@ -16,7 +16,7 @@
 
 #include <geometry_msgs/msg/pose.h>
 #include "sample_movement_ur3e_sim/mtc_planner.hpp"
-// #include "custom_msgs/srv/task_cmd.hpp"
+#include "custom_msgs/srv/task_cmd.hpp"
 
 
 class URTaskManager
@@ -71,7 +71,7 @@ class URTaskManager
     void sample_pose_change_cb(const geometry_msgs::msg::Pose::SharedPtr msg) ; 
 
     // void create_services();
-    // void create_services(const custom_msgs::srv::TaskCmd::Request::SharedPtr request, const custom_msgs::srv::TaskCmd::Response::SharedPtr response);
+    void create_services(const std::shared_ptr<custom_msgs::srv::TaskCmd::Request> request, const std::shared_ptr<custom_msgs::srv::TaskCmd::Response> response);
 
 
 // = rclcpp::get_logger("ur_task_manager");

@@ -1,3 +1,5 @@
+int8 task_number
+string sample_name
 int8 start_stage
 int8 end_stage
 ---
