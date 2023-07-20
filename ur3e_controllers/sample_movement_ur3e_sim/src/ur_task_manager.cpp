@@ -6,12 +6,13 @@ URTaskManager::URTaskManager(const rclcpp::NodeOptions& options)
   : node_{ std::make_shared<rclcpp::Node>("ur_task_manager", options) }
 {
 
+  create_nodes();
+
   subscription_ = node_->create_subscription<geometry_msgs::msg::Pose>(
       "sample_pose", 10, std::bind(&URTaskManager::sample_pose_change_cb, this, std::placeholders::_1));
   
   URTaskManager::task_service_ = node_->create_service<custom_msgs::srv::TaskCmd>( "ur_task_service",  std::bind(&URTaskManager::create_services, this, std::placeholders::_1, std::placeholders::_2) ); 
 
-  create_nodes();
   create_env();
 
 // std::bind(URTaskManager::create_services, this, std::placeholders::_1, std::placeholders::_2));
@@ -45,11 +46,10 @@ void URTaskManager::create_nodes(){
 
   URTaskManager::mtc_planner_node_ = new MTCPlanner(node_);
   // mtc_planner_node_->grab_from_top("sample1", 0 , 1);
-  mtc_planner_node_->grab_from_side("sample2", 0, 2);
+  // mtc_planner_node_->grab_from_side("sample2", 0, 2);
     // mtc_planner_node_->grab_from_top("sample1", 0 , 0); // Go to rest location
     // mtc_planner_node_->grab_from_top("sample1", 0 , 3); // From rest -> pick up -> place -> back to rest 
 
-  
 
 
 }
@@ -114,12 +114,14 @@ void URTaskManager::create_env()
         break;
     }
 
+  
     all_objects.push_back(obj);
 
   }
 
     URTaskManager::planning_scene_interface->applyCollisionObjects(all_objects);
     all_objects.clear();
+
 }
 
 /// @brief This callback changes parameter stack and recreate the env
