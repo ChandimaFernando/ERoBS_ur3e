@@ -233,6 +233,7 @@ void MTCPlanner::grab_from_side(std::string obj_to_pick, int start_stage, int en
     
     case pick_underarm::UNDERARM_TURN:
 
+        RCLCPP_INFO(LOGGER, "Inside UNDERARM_TURN ");  
         set_joint_goal("UNDERARM_POSE", underarm_turn_angles);
         task_executor();
         rclcpp::sleep_for(sleep_time);
@@ -339,8 +340,11 @@ void MTCPlanner::set_joint_goal(std::string task_name, std::vector<double> home_
 
       for (int i = 0; i < num_joints ; i++){
           {
+              RCLCPP_INFO(LOGGER, "MTCPlanner::under_arm_joint_order : %ld ", MTCPlanner::under_arm_joint_order[i] );  
+               RCLCPP_INFO(LOGGER, "joint_names[MTCPlanner::under_arm_joint_order[i]: %s ", joint_names[MTCPlanner::under_arm_joint_order[i]] );  
+              RCLCPP_INFO(LOGGER, "home_angle_list[MTCPlanner::under_arm_joint_order[i]] : %f ", home_angle_list[MTCPlanner::under_arm_joint_order[i]] );  
+             
               std::map<std::string, double> init_arm_pose{{joint_names[MTCPlanner::under_arm_joint_order[i]], home_angle_list[MTCPlanner::under_arm_joint_order[i]]}};
-              
               auto stage_pose = std::make_unique<moveit::task_constructor::stages::MoveTo>("move"+joint_names[MTCPlanner::under_arm_joint_order[i]], interpolation_planner);
               stage_pose->setGroup(arm_group_name_);
               stage_pose->setGoal(init_arm_pose);
