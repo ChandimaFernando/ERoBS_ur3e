@@ -46,6 +46,7 @@ ur_task_manager:
       underarm_pre_place: [-6.19120646, -2.17834544, -1.97763258, -1.89577663, 0.62936573, 0.07278]
       underarm_pre_pick: [-3.178942, -2.128429, -2.43386164, -1.7376498, -0.154287106, 0.07278 ] # The order of the angles has to be changes if the current results in collisions
       underarm_turn_angles: [-3.178942, -1.555786, -2.17502931, -1.68511539, -0.0774926188 , 0.07278 ] # The order of the angles has to be changes if the current results in collisions
+      under_arm_joint_order: [5, 3, 1, 2, 4, 6 ]
       hand_offset: 0.145
       base_frame: 'base_link'
       eef_frame: 'flange'

@@ -18,6 +18,7 @@ void MTCPlanner::initialize()
     underarm_turn_angles = node_->get_parameter("ur3e.underarm_turn_angles").as_double_array();
     underarm_pre_pick_angles = node_->get_parameter("ur3e.underarm_pre_pick").as_double_array();
     underarm_pre_place_angles = node_->get_parameter("ur3e.underarm_pre_place").as_double_array();   
+    under_arm_joint_order = node_->get_parameter("ur3e.under_arm_joint_order").as_integer_array();
     base_frame = node_->get_parameter("ur3e.base_frame").as_string();
     eef_frame = node_->get_parameter("ur3e.eef_frame").as_string();
 
@@ -334,23 +335,22 @@ void MTCPlanner::set_joint_goal(std::string task_name, std::vector<double> home_
 
     int num_joints = MTCPlanner::joint_names.size();
 
-    // if(task_name == "UNDERARM_POSE"){
+    if(task_name == "UNDERARM_POSE"){
 
-    //   int order [6] = { 5, 3, 2, 1, 4, 6 };
-    //   for (int i = 0; i < num_joints ; i++){
-    //       {
-    //           std::map<std::string, double> init_arm_pose{{joint_names[order[i]], home_angle_list[order[i]]}};
+      for (int i = 0; i < num_joints ; i++){
+          {
+              std::map<std::string, double> init_arm_pose{{joint_names[MTCPlanner::under_arm_joint_order[i]], home_angle_list[MTCPlanner::under_arm_joint_order[i]]}};
               
-    //           auto stage_pose = std::make_unique<moveit::task_constructor::stages::MoveTo>("move"+joint_names[order[i]], interpolation_planner);
-    //           stage_pose->setGroup(arm_group_name_);
-    //           stage_pose->setGoal(init_arm_pose);
-    //           MTCPlanner::task_.add(std::move(stage_pose));
-    //       }
+              auto stage_pose = std::make_unique<moveit::task_constructor::stages::MoveTo>("move"+joint_names[MTCPlanner::under_arm_joint_order[i]], interpolation_planner);
+              stage_pose->setGroup(arm_group_name_);
+              stage_pose->setGoal(init_arm_pose);
+              MTCPlanner::task_.add(std::move(stage_pose));
+          }
 
-    //   }
+      }
 
-    // }
-    // else{
+    }
+    else{
 
       for (int i = 0; i < num_joints ; i++){
           {
@@ -364,7 +364,7 @@ void MTCPlanner::set_joint_goal(std::string task_name, std::vector<double> home_
 
       }
 
-    // }
+    }
 
 }
 
