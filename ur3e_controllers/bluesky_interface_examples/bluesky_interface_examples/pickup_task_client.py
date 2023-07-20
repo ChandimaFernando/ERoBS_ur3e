@@ -36,6 +36,7 @@ def main():
     task_client = TaskClient()
     response = task_client.send_request(task_number, sample_name, start_stage, stop_stage)
 
+    
     task_client.destroy_node()
     rclpy.shutdown()
 
