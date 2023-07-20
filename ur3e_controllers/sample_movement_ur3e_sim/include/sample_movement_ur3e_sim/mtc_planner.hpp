@@ -63,7 +63,12 @@ class MTCPlanner
         /// @brief Turn towards the place area for the ur3e arm
         std::vector<double> top_pre_place_angles ;
         /// @brief Underarm pose
-        std::vector<double> underarm_turn_angels ;
+        std::vector<double> underarm_turn_angles ;
+        /// @brief Turn towards the samples for the ur3e arm
+        std::vector<double> underarm_pre_pick_angles ;
+        /// @brief Turn towards the place area for the ur3e arm
+        std::vector<double> underarm_pre_place_angles ;
+        
         /// @brief Holds sample location read from the params file
         std::vector<geometry_msgs::msg::Pose> sample_locations ; //= geometry_msgs::msg::Pose();
         geometry_msgs::msg::Pose taregt_location = geometry_msgs::msg::Pose();
@@ -103,8 +108,8 @@ class MTCPlanner
         void move_arm_home();
         /// @brief Set joint values in ur3e from the base to wrist_3
         /// @param task_name name of the task
-        /// @param home_angel_list list of angles from the param file
-        void set_joint_goal(std::string task_name, std::vector<double> home_angel_list);
+        /// @param home_angle_list list of angles from the param file
+        void set_joint_goal(std::string task_name, std::vector<double> home_angle_list);
         void move_arm_underarm();
         void side_pre_pick();
         void top_swipe();
@@ -112,7 +117,7 @@ class MTCPlanner
         void top_retreat(std::string task_name) ;
 
         void underarm_approach(std::string task_name, std::string obj_to_picks);
-        void underarm_retreat(std::string task_name, std::string obj_to_picks) ;
+        void underarm_retreat(std::string task_name) ;
 
         geometry_msgs::msg::PoseStamped get_eef_pose();
 
