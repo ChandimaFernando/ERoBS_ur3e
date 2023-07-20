@@ -41,15 +41,15 @@ ur_task_manager:
       rest_angles: [-3.13129, -1.61251, -1.55614, -1.52612, 1.54078, 0.07278] #For real robot
       ##### Over arm pick up #######
       top_pre_pick: [-3.486840, -1.61251, -1.55614, -1.52612, 1.54078, 0.39566614 ] #overhead
-      top_pre_place: [-0.8419468, -1.61251, -1.55614, -1.52612, 1.54078, 1.3796827]       
+      top_pre_place: [-0.8419468, -1.61251, -1.55614, -1.52612, 1.54078, 1.3796827]
       ##### Under arm pick up #######
-      underarm_turn_angles: [-3.85194166, -0.8011061, 1.6901768, -0.95137897, 3.0473448, 0.07278]
-      underarm_pre_pick: [0  , -0,  0 , 0 , 0 , 0 ] # The order of the angles has to be changes if the current results in collisions
-      underarm_pre_place: [0  , -0,  0 , 0 , 0 , 0 ] # The order of the angles has to be changes if the current results in collisions
+      underarm_pre_place: [-6.19120646, -2.17834544, -1.97763258, -1.89577663, 0.62936573, 0.07278]
+      underarm_pre_pick: [-3.178942, -2.128429, -2.43386164, -1.7376498, -0.154287106, 0.07278 ] # The order of the angles has to be changes if the current results in collisions
+      underarm_turn_angles: [-3.178942, -1.555786, -2.17502931, -1.68511539, -0.0774926188 , 0.07278 ] # The order of the angles has to be changes if the current results in collisions
       hand_offset: 0.145
       base_frame: 'base_link'
       eef_frame: 'flange'
-      finger_offset_x: 0.0s
+      finger_offset_x: 0.0
       finger_offset_y: 0.0
       finger_offset_z: 0.01
       axis_tolarance: 0.1
