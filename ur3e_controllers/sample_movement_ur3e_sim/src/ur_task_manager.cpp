@@ -46,9 +46,10 @@ void URTaskManager::create_nodes(){
 
   URTaskManager::planning_scene_interface = new moveit::planning_interface::PlanningSceneInterface() ;
 
-  URTaskManager::mtc_planner_node_ = new MTCPlanner(node_);
+  // URTaskManager::mtc_planner_node_ = new MTCPlanner(node_);
+  // URTaskManager::mtc_planner_node_ = new MTCPlanner(node_, URTaskManager::client_);
 
-  mtc_planner_node_->grab_from_side("sample1", 3, 4); //called to a service when commented out
+  // mtc_planner_node_->grab_from_side("sample1", 3, 4); //called to a service when commented out
     // mtc_planner_node_->grab_from_top("sample1", 0 , 0); // Go to rest location
     //mtc_planner_node_->grab_from_top("sample1", 0 , 3); // From rest -> pick up -> place -> back to rest 
 
@@ -162,7 +163,6 @@ void URTaskManager::create_services(const std::shared_ptr<custom_msgs::srv::Task
     switch(task_number){
 
     case 1:
-      std::cout <<  " $$$$$$ Stage 1 " << std::endl ;
       URTaskManager::mtc_planner_node_->grab_from_top(sample_name, start_stage , end_stage);
       status = true ;
       break ;
