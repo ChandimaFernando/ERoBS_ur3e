@@ -45,11 +45,10 @@ void URTaskManager::create_nodes(){
   URTaskManager::planning_scene_interface = new moveit::planning_interface::PlanningSceneInterface() ;
 
   URTaskManager::mtc_planner_node_ = new MTCPlanner(node_);
-  // mtc_planner_node_->grab_from_top("sample1", 0 , 1);
-  mtc_planner_node_->grab_from_side("sample1", 0, 4);
 
+  mtc_planner_node_->grab_from_side("sample1", 3, 4); //called to a service when commented out
     // mtc_planner_node_->grab_from_top("sample1", 0 , 0); // Go to rest location
-    // mtc_planner_node_->grab_from_top("sample1", 0 , 3); // From rest -> pick up -> place -> back to rest 
+    //mtc_planner_node_->grab_from_top("sample1", 0 , 3); // From rest -> pick up -> place -> back to rest 
 
 
 

@@ -7,9 +7,9 @@ ur_task_manager:
         type: 'CYLINDER'
         h: 0.1 # height
         r: 0.02 # radius
-        x: 0.16 #0.19 ->overhead 0.16->underarm
-        y: -0.382 #-0.43 ->overhead -0.38 -> underarm
-        z: 0.04 #0.017->overhead #0.04 ->underarm
+        x: 0.19
+        y: -0.43 #-0.40 ->overhead -0.43 -> underarm
+        z: 0.017 #underarm #0.04 ->underarm
       sample2:
         type: 'CYLINDER'
         h: 0.1 # height
@@ -23,9 +23,9 @@ ur_task_manager:
         d: 0.1 # depth
         h: 0.01 # height
         #w: 0.0 # pose, orientation 
-        x: -0.17 # -0.15->ovehead -0.17->underarm
-        y: 0.31 # 0.34->overhead 0.31->underarm
-        z: 0.14 # 0.04->overhead 0.14->underarm
+        x: -0.15 # pose x
+        y: 0.34 # pose y
+        z: 0.04 # pose z
       table:
         type: 'BOX'
         w: 2.0 # width
@@ -40,10 +40,10 @@ ur_task_manager:
       # rest_angles: [-1.600699, -1.4477506, -1.7994345, -1.4871951, 1.595100] #[shoulder_pan_joint, shoulder_lift_joint, elbow_joint, wrist_1_joint, wrist_2_joint]
       rest_angles: [-3.13129, -1.61251, -1.55614, -1.52612, 1.54078, 0.07278] #For real robot
       ##### Over arm pick up #######
-      top_pre_pick: [-3.9793507, -1.61251, -1.55614, -1.52612, 1.54078, 0.61959188 ] #overhead
+      top_pre_pick: [-3.9793507, -2.07694181, -1.52612, 1.54078, 0.39566614 ] #overhead
       top_pre_place: [-0.8419468, -1.61251, -1.55614, -1.52612, 1.54078, 1.3796827]
       ##### Under arm pick up #######
-      underarm_pre_place: [-6.18021088, -2.27765467, -1.88984251, -1.9263199, 0.65083328, 3.00266445]
+      underarm_pre_place: [-6.19120646, -2.17834544, -1.97763258, -1.89577663, 0.62936573, 3.16183847]
       underarm_pre_pick: [-3.178942, -2.128429, -2.43386164, -1.7376498, -0.154287106, 3.16183847 ] # The order of the angles has to be changes if the current results in collisions
       underarm_turn_angles: [-2.83319298, -2.05931398, -1.70431401, -2.57715317, -0.154287106, 3.16183847 ] # The order of the angles has to be changes if the current results in collisions
       under_arm_joint_order: [4, 2, 0, 1, 3, 5 ]
