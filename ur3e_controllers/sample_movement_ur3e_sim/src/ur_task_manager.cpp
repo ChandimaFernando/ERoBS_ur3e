@@ -13,7 +13,7 @@ URTaskManager::URTaskManager(const rclcpp::NodeOptions& options)
   
   URTaskManager::task_service_ = node_->create_service<custom_msgs::srv::TaskCmd>( "ur_task_service",  std::bind(&URTaskManager::create_services, this, std::placeholders::_1, std::placeholders::_2) ); 
 
-  URTaskManager::client_  = node_->create_client<custom_msgs::srv::GripperCmd>("gripper_service");
+  // URTaskManager::client_  = node_->create_client<custom_msgs::srv::GripperCmd>("gripper_service");
 
   create_env();
 
@@ -46,11 +46,11 @@ void URTaskManager::create_nodes(){
 
   URTaskManager::planning_scene_interface = new moveit::planning_interface::PlanningSceneInterface() ;
 
-  // URTaskManager::mtc_planner_node_ = new MTCPlanner(node_);
+  URTaskManager::mtc_planner_node_ = new MTCPlanner(node_);
   // URTaskManager::mtc_planner_node_ = new MTCPlanner(node_, URTaskManager::client_);
 
   // mtc_planner_node_->grab_from_side("sample1", 3, 4); //called to a service when commented out
-    // mtc_planner_node_->grab_from_top("sample1", 0 , 0); // Go to rest location
+    mtc_planner_node_->grab_from_top("sample1", 0 , 1); // Go to rest location
     //mtc_planner_node_->grab_from_top("sample1", 0 , 3); // From rest -> pick up -> place -> back to rest 
 
 
@@ -156,7 +156,7 @@ void URTaskManager::create_services(const std::shared_ptr<custom_msgs::srv::Task
 
   bool status = false ;
 
-  URTaskManager::mtc_planner_node_ = new MTCPlanner(node_, URTaskManager::client_);
+  // URTaskManager::mtc_planner_node_ = new MTCPlanner(node_, URTaskManager::client_);
 
   try
   {

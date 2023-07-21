@@ -1,9 +1,12 @@
 #include "sample_movement_ur3e_sim/mtc_planner.hpp"
 
-MTCPlanner::MTCPlanner(const rclcpp::Node::SharedPtr& node, const rclcpp::Client<custom_msgs::srv::GripperCmd>::SharedPtr& client )
+// MTCPlanner::MTCPlanner(const rclcpp::Node::SharedPtr& node, const rclcpp::Client<custom_msgs::srv::GripperCmd>::SharedPtr& client )
+MTCPlanner::MTCPlanner(const rclcpp::Node::SharedPtr& node)
+
 {
     node_ = node ;
-    MTCPlanner::client_ = client ;
+    // MTCPlanner::client_ = client ;
+    MTCPlanner::client_ = node->create_client<custom_msgs::srv::GripperCmd>("gripper_service");
 
     initialize();
 }
@@ -856,9 +859,6 @@ void MTCPlanner::gripper_open(){
 
   request->grip = 10 ;
   request->cmd = 'O' ;
-
-  RCLCPP_INFO(LOGGER, " ######### inside gripper open");  
-
  
   while (!MTCPlanner::client_->wait_for_service(1s)) {
     if (!rclcpp::ok()) {
@@ -867,10 +867,7 @@ void MTCPlanner::gripper_open(){
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
   }
 
-    RCLCPP_INFO(LOGGER, " ######### inside gripper open 2 ");  
-
   auto result = MTCPlanner::client_->async_send_request(request);
-  RCLCPP_INFO(LOGGER, " ######### inside gripper open 3");  
 
   // Wait for the result.
   if (rclcpp::spin_until_future_complete(node_, result) ==
