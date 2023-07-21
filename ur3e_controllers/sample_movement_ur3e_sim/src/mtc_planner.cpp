@@ -1,10 +1,9 @@
 #include "sample_movement_ur3e_sim/mtc_planner.hpp"
 
-MTCPlanner::MTCPlanner(const rclcpp::Node::SharedPtr& node)
+MTCPlanner::MTCPlanner(const rclcpp::Node::SharedPtr& node, const rclcpp::Client<custom_msgs::srv::GripperCmd>::SharedPtr& client )
 {
     node_ = node ;
-    client_  = node->create_client<custom_msgs::srv::GripperCmd>("gripper_service");
-
+    MTCPlanner::client_ = client ;
 
     initialize();
 }
@@ -677,94 +676,7 @@ void MTCPlanner::top_approach(std::string task_name, std::string obj_to_pick){
     move_group_interface.execute(trajectory);
 
 }
-/*
-void MTCPlanner::top_approach(std::string task_name, std::string obj_to_pick){
 
-    // Retreive the length of the gripper
-    double hand_offset = node_->get_parameter("ur3e.hand_offset").as_double();
-
-    // Calculate distances to the target
-    double obj_x = node_->get_parameter("objects." + obj_to_pick + ".x").as_double() ;
-    double obj_y = node_->get_parameter("objects." + obj_to_pick + ".y").as_double() ;
-    double obj_z = node_->get_parameter("objects." + obj_to_pick + ".z").as_double() ;
-
-
-    // Retrieve arm location in xyz
-    geometry_msgs::msg::PoseStamped arm_pose ;
-    arm_pose = MTCPlanner::get_eef_pose();
-
-    MTCPlanner::arm_top_approach_dists.pose.position.x =  obj_x - arm_pose.pose.position.x ;
-    MTCPlanner::arm_top_approach_dists.pose.position.y =  obj_y - arm_pose.pose.position.y ;
-    MTCPlanner::arm_top_approach_dists.pose.position.z =  obj_z - arm_pose.pose.position.z ;
-
-    RCLCPP_INFO(LOGGER, "obj_x : %f ", obj_x );  
-    RCLCPP_INFO(LOGGER, "obj_y : %f ", obj_y );  
-    RCLCPP_INFO(LOGGER, "obj_z : %f ", obj_z );  
-
-    RCLCPP_INFO(LOGGER, "arm_pose.pose.position.x : %f ", arm_pose.pose.position.x );  
-    RCLCPP_INFO(LOGGER, "arm_pose.pose.position.y : %f ", arm_pose.pose.position.y );  
-    RCLCPP_INFO(LOGGER, "arm_pose.pose.position.z : %f ", arm_pose.pose.position.z );  
-
-    RCLCPP_INFO(LOGGER, "MTCPlanner::arm_top_approach_dists.pose.position.x : %f ", MTCPlanner::arm_top_approach_dists.pose.position.x  );  
-    RCLCPP_INFO(LOGGER, "MTCPlanner::arm_top_approach_dists.pose.position.y : %f ", MTCPlanner::arm_top_approach_dists.pose.position.y  );  
-    RCLCPP_INFO(LOGGER, "MTCPlanner::arm_top_approach_dists.pose.position.z : %f ", MTCPlanner::arm_top_approach_dists.pose.position.z  );  
-
-    MTCPlanner::task_.clear();
-    MTCPlanner::task_.stages()->setName(task_name);
-    MTCPlanner::task_.loadRobotModel(node_);
-    // auto ppp = task_.getRobotModel();
-    // auto names = ppp->getLinkModelNames();
-
-    // for (std::string i: names){
-    //     std::cout << "joints : " << i << std::endl ;
-    //     // RCLCPP_INFO(LOGGER, "joint names : %s ", i );  
-    // }
-
-    MTCPlanner::task_.setProperty("group", arm_group_name_);
-    MTCPlanner::task_.setProperty("eef", eff_name_);
-    MTCPlanner::task_.setProperty("ik_frame", hand_frame_);
-    MTCPlanner::task_.setProperty("hand", hand_group_name_);
-    MTCPlanner::task_.setProperty("hand_grasping_frame", hand_frame_);
-
-    // Disable warnings for this line, as it's a variable that's set but not used in this example
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-    moveit::task_constructor::Stage* current_state_ptr = nullptr;  // Forward current_state on to grasp pose generator
-    #pragma GCC diagnostic pop
-
-  auto sampling_planner = std::make_shared<moveit::task_constructor::solvers::PipelinePlanner>(node_);
-  sampling_planner->setProperty("planning_plugin","chomp_interface/CHOMPPlanner");
-  auto interpolation_planner = std::make_shared<moveit::task_constructor::solvers::JointInterpolationPlanner>();
-
-  auto cartesian_planner = std::make_shared<moveit::task_constructor::solvers::CartesianPath>();
-  cartesian_planner->setMaxVelocityScaling(1.0);
-  cartesian_planner->setMaxAccelerationScaling(1.0);
-  cartesian_planner->setStepSize(.01);
-
-
-  auto stage_state_current = std::make_unique<moveit::task_constructor::stages::CurrentState>("current");
-  current_state_ptr = stage_state_current.get();
-  MTCPlanner::task_.add(std::move(stage_state_current));
-
-    // {
-    //     auto stage = std::make_unique<moveit::task_constructor::stages::MoveRelative>("approach object x", cartesian_planner);
-    //     stage->properties().set("marker_ns", "approachx");
-    //     stage->properties().set("link", eff_name_);
-    //     stage->properties().configureInitFrom(moveit::task_constructor::Stage::PARENT, { "group" });
-    //     stage->setMinMaxDistance(0.1, 0.15);
-
-    //     // Set hand forward direction
-    //     geometry_msgs::msg::Vector3Stamped vec;
-    //     vec.header.frame_id = hand_frame_;
-    //     vec.vector.x = MTCPlanner::arm_top_approach_dists.pose.position.x*0.5 ;
-    //     vec.vector.y = MTCPlanner::arm_top_approach_dists.pose.position.y*0.5 ;
-    //     vec.vector.z = MTCPlanner::arm_top_approach_dists.pose.position.z*0.1 ;
-    //     stage->setDirection(vec);
-    //     RCLCPP_INFO(LOGGER, "vec.vector.x  : %f ", vec.vector.x );  
-    //     MTCPlanner::task_.add(std::move(stage));
-    // }
-
-}*/
 
 
 
@@ -938,20 +850,27 @@ geometry_msgs::msg::PoseStamped MTCPlanner::get_eef_pose(){
 }
 
 void MTCPlanner::gripper_open(){
-
+ try
+  {
   auto request = std::make_shared<custom_msgs::srv::GripperCmd::Request>();
 
   request->grip = 10 ;
   request->cmd = 'O' ;
 
-  while (!client_->wait_for_service(1s)) {
+  RCLCPP_INFO(LOGGER, " ######### inside gripper open");  
+
+ 
+  while (!MTCPlanner::client_->wait_for_service(1s)) {
     if (!rclcpp::ok()) {
       RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
     }
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
   }
 
-  auto result = client_->async_send_request(request);
+    RCLCPP_INFO(LOGGER, " ######### inside gripper open 2 ");  
+
+  auto result = MTCPlanner::client_->async_send_request(request);
+  RCLCPP_INFO(LOGGER, " ######### inside gripper open 3");  
 
   // Wait for the result.
   if (rclcpp::spin_until_future_complete(node_, result) ==
@@ -960,6 +879,12 @@ void MTCPlanner::gripper_open(){
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Results: %d", result.get()->status);
   } else {
     RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service");
+  }
+
+    }
+  catch(const std::exception& e)
+  {
+    std::cerr << e.what() << '\n';
   }
 
 }
@@ -971,14 +896,14 @@ void MTCPlanner::gripper_close(){
   request->grip = 10 ;
   request->cmd = 'C' ;
 
-  while (!client_->wait_for_service(1s)) {
+  while (!MTCPlanner::client_->wait_for_service(1s)) {
     if (!rclcpp::ok()) {
       RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
     }
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
   }
 
-  auto result = client_->async_send_request(request);
+  auto result = MTCPlanner::client_->async_send_request(request);
 
   // Wait for the result.
   if (rclcpp::spin_until_future_complete(node_, result) ==

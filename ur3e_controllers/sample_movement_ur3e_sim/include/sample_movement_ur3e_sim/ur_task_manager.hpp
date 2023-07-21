@@ -73,8 +73,7 @@ class URTaskManager
     // void create_services();
     void create_services(const std::shared_ptr<custom_msgs::srv::TaskCmd::Request> request, const std::shared_ptr<custom_msgs::srv::TaskCmd::Response> response);
 
-
-// = rclcpp::get_logger("ur_task_manager");
+    rclcpp::Client<custom_msgs::srv::GripperCmd>::SharedPtr client_;
 
 };
 

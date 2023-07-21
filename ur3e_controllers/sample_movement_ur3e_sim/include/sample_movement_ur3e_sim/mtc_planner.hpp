@@ -30,7 +30,7 @@ class MTCPlanner
 {
     public:
     
-        MTCPlanner(const rclcpp::Node::SharedPtr& node);
+        MTCPlanner(const rclcpp::Node::SharedPtr& node, const rclcpp::Client<custom_msgs::srv::GripperCmd>::SharedPtr& client );
         /// @brief read and save values from the param file
         void initialize();
         /// @brief State machine equivalent of picking from top

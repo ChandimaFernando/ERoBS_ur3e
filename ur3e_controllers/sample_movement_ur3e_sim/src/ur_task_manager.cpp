@@ -13,6 +13,8 @@ URTaskManager::URTaskManager(const rclcpp::NodeOptions& options)
   
   URTaskManager::task_service_ = node_->create_service<custom_msgs::srv::TaskCmd>( "ur_task_service",  std::bind(&URTaskManager::create_services, this, std::placeholders::_1, std::placeholders::_2) ); 
 
+  URTaskManager::client_  = node_->create_client<custom_msgs::srv::GripperCmd>("gripper_service");
+
   create_env();
 
 // std::bind(URTaskManager::create_services, this, std::placeholders::_1, std::placeholders::_2));
@@ -153,6 +155,8 @@ void URTaskManager::create_services(const std::shared_ptr<custom_msgs::srv::Task
 
   bool status = false ;
 
+  URTaskManager::mtc_planner_node_ = new MTCPlanner(node_, URTaskManager::client_);
+
   try
   {
     switch(task_number){
@@ -210,9 +214,3 @@ int main(int argc, char *argv[])
   return 0;
 }
 
-// double curve_extension_xy = node->get_parameter("curve_extension_xy").as_double();
-// void URTaskManager::create_services(const custom_msgs::srv::TaskCmd::Request::SharedPtr request, const custom_msgs::srv::TaskCmd::Response::SharedPtr response)
-// {
-// }
-
-// void URTaskManager::create_services(){}
