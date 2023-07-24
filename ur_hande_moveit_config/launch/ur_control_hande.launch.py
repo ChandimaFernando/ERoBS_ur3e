@@ -325,6 +325,13 @@ def launch_setup(context, *args, **kwargs):
         condition=UnlessCondition(activate_joint_controller),
     )
 
+    gripper_node =  Node(
+        package='robotiq_driver',
+        executable='gripper_interface_test',
+        name='gripper_interface_test',
+        output="screen",
+    )  
+
     nodes_to_start = [
         control_node,
         ur_control_node,
@@ -340,6 +347,7 @@ def launch_setup(context, *args, **kwargs):
         forward_position_controller_spawner_stopped,
         initial_joint_controller_spawner_stopped,
         initial_joint_controller_spawner_started,
+        gripper_node,
     ]
 
     return nodes_to_start

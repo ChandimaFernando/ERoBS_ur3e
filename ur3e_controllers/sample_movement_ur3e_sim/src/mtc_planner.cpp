@@ -20,7 +20,10 @@ void MTCPlanner::initialize()
     underarm_turn_angles = node_->get_parameter("ur3e.underarm_turn_angles").as_double_array();
     underarm_pre_pick_angles = node_->get_parameter("ur3e.underarm_pre_pick").as_double_array();
     underarm_pre_place_angles = node_->get_parameter("ur3e.underarm_pre_place").as_double_array();   
+    underarm_base_rotation_for_return = node_->get_parameter("ur3e.underarm_base_rotation_for_return").as_double_array();   
     under_arm_joint_order = node_->get_parameter("ur3e.under_arm_joint_order").as_integer_array();
+
+
     base_frame = node_->get_parameter("ur3e.base_frame").as_string();
     eef_frame = node_->get_parameter("ur3e.eef_frame").as_string();
 
@@ -280,12 +283,16 @@ void MTCPlanner::grab_from_side(std::string obj_to_pick, int start_stage, int en
 	      gripper_close();       // close the gripper here
 	      rclcpp::sleep_for(sleep_time);
         underarm_retreat("UNDERARM RETREAT");
+	      rclcpp::sleep_for(sleep_time);
 
         pick_underarm_enum_value = pick_underarm::UNDERARM_RETURNED ;
         break;
 
     case pick_underarm::UNDERARM_RETURNED :
      
+
+        set_joint_goal("UNDERARM PRE RETURN", underarm_base_rotation_for_return);
+        task_executor();
         set_joint_goal("UNDERARM PRE RETURN", underarm_pre_pick_angles);
         task_executor();
         underarm_approach("UNDERARM APPROACH RETURN", obj_to_pick);
@@ -851,6 +858,7 @@ geometry_msgs::msg::PoseStamped MTCPlanner::get_eef_pose(){
     return eef_pose ;
 
 }
+
 
 void MTCPlanner::gripper_open(){
  try

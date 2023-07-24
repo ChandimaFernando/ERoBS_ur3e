@@ -69,7 +69,8 @@ class MTCPlanner
         std::vector<double> underarm_pre_pick_angles ;
         /// @brief Turn towards the place area for the ur3e arm
         std::vector<double> underarm_pre_place_angles ;
-        
+        std::vector<double> underarm_base_rotation_for_return ;
+
         std::vector<long int> under_arm_joint_order ;
         /// @brief Holds sample location read from the params file
         std::vector<geometry_msgs::msg::Pose> sample_locations ; //= geometry_msgs::msg::Pose();
