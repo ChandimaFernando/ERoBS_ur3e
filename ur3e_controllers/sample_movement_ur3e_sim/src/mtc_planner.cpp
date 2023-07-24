@@ -257,9 +257,6 @@ void MTCPlanner::grab_from_side(std::string obj_to_pick, int start_stage, int en
 	      rclcpp::sleep_for(sleep_time);
         underarm_retreat("UNDERARM RETREAT");
 	      rclcpp::sleep_for(sleep_time);
-	set_joint_goal("UNDERARM POSE", underarm_turn_angles);
-	task_executor();
-	rclcpp::sleep_for(sleep_time);
 
         // pick_underarm_enum_value = pick_underarm::UNDERARM_PLACE ;
         break;
