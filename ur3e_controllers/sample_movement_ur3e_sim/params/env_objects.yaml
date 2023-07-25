@@ -34,7 +34,7 @@ ur_task_manager:
         z: 0.11 # 0.04->overhead 0.11->underarm
         euler_x: 0.0
         euler_y: 0.0
-        euler_z: 0.0 # This is in degrees
+        euler_z: 45.0 # This is in degrees
       table:
         type: 'BOX'
         w: 2.0 # width

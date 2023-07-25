@@ -398,6 +398,9 @@ void MTCPlanner::underarm_approach(std::string task_name, std::string obj_to_pic
     double obj_y = node_->get_parameter("objects." + obj_to_pick + ".y").as_double() + hand_offset*cos(obj_yaw);
     double obj_z = node_->get_parameter("objects." + obj_to_pick + ".z").as_double() ;
 
+    RCLCPP_INFO(LOGGER, "offset on x  : %f ", hand_offset*sin(obj_yaw));  
+    RCLCPP_INFO(LOGGER, "offset on y  : %f ", hand_offset*cos(obj_yaw));  
+
 
     MTCPlanner::under_arm_approach_dists.pose.position.x =  obj_x - (arm_pose.pose.position.x ) ;
     MTCPlanner::under_arm_approach_dists.pose.position.y =  obj_y - (arm_pose.pose.position.y ) ;
