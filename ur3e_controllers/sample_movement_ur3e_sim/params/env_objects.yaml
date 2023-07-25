@@ -67,5 +67,5 @@ ur_task_manager:
       finger_offset_y: 0.0
       finger_offset_z: 0.01
       axis_tolarance: 0.1
-      simulation: true
+      simulation: false
 
