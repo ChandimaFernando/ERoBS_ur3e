@@ -507,6 +507,10 @@ void MTCPlanner::underarm_approach(std::string task_name, std::string obj_to_pic
     // Add the waypoints, including the final point
     intrm_pose.position.y = obj_y ;
     intrm_pose.position.x = obj_x ;
+
+        RCLCPP_INFO(LOGGER, "intrm_pose.position.x : %f ", intrm_pose.position.x );  
+        RCLCPP_INFO(LOGGER, "intrm_pose.position.y : %f ", intrm_pose.position.y);  
+        
     waypoints.push_back(intrm_pose);
 
     move_group_interface.computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
