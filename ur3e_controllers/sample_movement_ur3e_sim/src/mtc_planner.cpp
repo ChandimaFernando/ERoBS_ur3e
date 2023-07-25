@@ -6,7 +6,7 @@ MTCPlanner::MTCPlanner(const rclcpp::Node::SharedPtr& node)
 {
     node_ = node ;
     // MTCPlanner::client_ = client ;
-    // MTCPlanner::client_ = node->create_client<custom_msgs::srv::GripperCmd>("gripper_service");
+    MTCPlanner::client_ = node->create_client<custom_msgs::srv::GripperCmd>("gripper_service");
 
     initialize();
 }
