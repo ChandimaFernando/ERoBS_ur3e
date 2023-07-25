@@ -241,7 +241,7 @@ def generate_launch_description():
         name="static_transform_publisher",
         output="log",
         arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "world", "right_finger"],
-    	)
+    	),
 
         Node(
             package='robotiq_driver',
