@@ -394,8 +394,8 @@ void MTCPlanner::underarm_approach(std::string task_name, std::string obj_to_pic
     arm_pose = MTCPlanner::get_eef_pose();
 
     // Calculate distances to the target
-    double obj_x = node_->get_parameter("objects." + obj_to_pick + ".x").as_double() - hand_offset*sin(obj_yaw);
-    double obj_y = node_->get_parameter("objects." + obj_to_pick + ".y").as_double() - hand_offset*cos(obj_yaw);
+    double obj_x = node_->get_parameter("objects." + obj_to_pick + ".x").as_double() + hand_offset*sin(obj_yaw);
+    double obj_y = node_->get_parameter("objects." + obj_to_pick + ".y").as_double() + hand_offset*cos(obj_yaw);
     double obj_z = node_->get_parameter("objects." + obj_to_pick + ".z").as_double() ;
 
 
