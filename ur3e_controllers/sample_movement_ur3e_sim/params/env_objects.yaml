@@ -10,6 +10,9 @@ ur_task_manager:
         x: 0.16 #0.19 ->overhead 0.16->underarm
         y: -0.382 #-0.43 ->overhead -0.38 -> underarm
         z: 0.04 #0.017->overhead #0.04 ->underarm
+        euler_x: 0.0
+        euler_y: 0.0
+        euler_z: 0.0        
       sample2:
         type: 'CYLINDER'
         h: 0.1 # height
@@ -17,6 +20,9 @@ ur_task_manager:
         x: 0.45
         y: -0.36
         z: 0.05
+        euler_x: 0.0
+        euler_y: 0.0
+        euler_z: 20.0        
       target:
         type: 'BOX'
         w: 0.1 # width
@@ -26,6 +32,9 @@ ur_task_manager:
         x: -0.21 # -0.15->ovehead -0.24->underarm
         y: 0.31 # 0.34->overhead 0.33->underarm
         z: 0.11 # 0.04->overhead 0.11->underarm
+        euler_x: 0.0
+        euler_y: 0.0
+        euler_z: 5.0 # This is in degrees
       table:
         type: 'BOX'
         w: 2.0 # width
@@ -35,6 +44,9 @@ ur_task_manager:
         x: 0.0 # pose x
         y: 0.0 # pose y
         z: -0.01 # pose z
+        euler_x: 0.0
+        euler_y: 0.0
+        euler_z: 0.0
     ur3e:
       joint_names: ['shoulder_pan_joint' , 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
       # rest_angles: [-1.600699, -1.4477506, -1.7994345, -1.4871951, 1.595100] #[shoulder_pan_joint, shoulder_lift_joint, elbow_joint, wrist_1_joint, wrist_2_joint]
@@ -55,4 +67,5 @@ ur_task_manager:
       finger_offset_y: 0.0
       finger_offset_z: 0.01
       axis_tolarance: 0.1
+      simulation: true
 

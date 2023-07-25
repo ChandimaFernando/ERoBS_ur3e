@@ -49,7 +49,7 @@ void URTaskManager::create_nodes(){
   URTaskManager::mtc_planner_node_ = new MTCPlanner(node_);
   // URTaskManager::mtc_planner_node_ = new MTCPlanner(node_, URTaskManager::client_);
 
-  mtc_planner_node_->grab_from_side("sample1", 0, 4); //called to a service when commented out
+  mtc_planner_node_->grab_from_side("sample1", 0, 2); //called to a service when commented out
    // mtc_planner_node_->grab_from_top("sample1", 0 , 1); // Go to rest location
     //mtc_planner_node_->grab_from_top("sample1", 0 , 3); // From rest -> pick up -> place -> back to rest 
 
@@ -72,6 +72,8 @@ void URTaskManager::create_env()
   std::vector<std::string> object_names =  node_->get_parameter("object_names").as_string_array();
 
   std::vector<moveit_msgs::msg::CollisionObject> all_objects ;
+
+  tf2::Quaternion quaternion;
 
   // Create objects in a recursion
   for(int i = 0 ; i < num_objects ; i++){
@@ -111,7 +113,18 @@ void URTaskManager::create_env()
         pose.position.x = node_->get_parameter("objects." + name + ".x").as_double() ;
         pose.position.y = node_->get_parameter("objects." + name + ".y").as_double() ;
         pose.position.z = node_->get_parameter("objects." + name + ".z").as_double() ;
+
+        quaternion.setRPY(node_->get_parameter("objects." + name + ".euler_y").as_double(), node_->get_parameter("objects." + name + ".euler_x").as_double(), node_->get_parameter("objects." + name + ".euler_z").as_double());
+
+        pose.orientation.x = quaternion.getX() ;
+        pose.orientation.y = quaternion.getY() ;
+        pose.orientation.z = quaternion.getZ() ;
+        pose.orientation.w = quaternion.getW() ;
+
         obj.pose = pose ;
+
+        break;
+
 
       default:
         break;
@@ -170,6 +183,7 @@ void URTaskManager::create_services(const std::shared_ptr<custom_msgs::srv::Task
     case 2:
        URTaskManager::mtc_planner_node_->grab_from_side(sample_name, start_stage, end_stage);
        status = true ;
+       break;
 
     default:
       status = false ;

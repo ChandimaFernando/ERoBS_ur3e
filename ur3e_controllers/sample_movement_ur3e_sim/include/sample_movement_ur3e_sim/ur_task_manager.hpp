@@ -18,6 +18,9 @@
 #include "sample_movement_ur3e_sim/mtc_planner.hpp"
 #include "custom_msgs/srv/task_cmd.hpp"
 
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2/convert.h>
+#include <tf2/impl/utils.h>
 
 class URTaskManager
 {

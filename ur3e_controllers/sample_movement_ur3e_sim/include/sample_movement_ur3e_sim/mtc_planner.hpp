@@ -80,6 +80,9 @@ class MTCPlanner
         geometry_msgs::msg::PoseStamped arm_top_approach_dists ;
         geometry_msgs::msg::PoseStamped under_arm_approach_dists ;
 
+        /// @brief True if run on rviz simulator, false on real-robot. Set via param file.
+        bool if_simulation_ ;
+
         // To compute transform coords
         std::shared_ptr<tf2_ros::TransformListener> tf_listener_{nullptr};
         std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
@@ -108,7 +111,6 @@ class MTCPlanner
         const std::string eff_name_ = "right_finger";
         const std::string  hand_frame_ = "hand";    
 
-        void move_arm_home();
         /// @brief Set joint values in ur3e from the base to wrist_3
         /// @param task_name name of the task
         /// @param home_angle_list list of angles from the param file
