@@ -17,12 +17,12 @@ ur_task_manager:
         type: 'CYLINDER'
         h: 0.1 # height
         r: 0.02 # radius
-        x: 0.21
+        x: 0.18
         y: -0.50
-        z: 0.05
+        z: 0.04 
         euler_x: 0.0
         euler_y: 0.0
-        euler_z: 20.0        
+        euler_z: 0.0        
       target:
         type: 'BOX'
         w: 0.1 # width
@@ -34,7 +34,7 @@ ur_task_manager:
         z: 0.11 # 0.04->overhead 0.11->underarm
         euler_x: 0.0
         euler_y: 0.0
-        euler_z: 5.0 # This is in degrees
+        euler_z: 0.0 # This is in degrees
       table:
         type: 'BOX'
         w: 2.0 # width
