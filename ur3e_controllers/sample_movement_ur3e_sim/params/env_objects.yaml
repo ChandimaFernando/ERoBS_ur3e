@@ -17,8 +17,8 @@ ur_task_manager:
         type: 'CYLINDER'
         h: 0.1 # height
         r: 0.02 # radius
-        x: 0.45
-        y: -0.36
+        x: 0.21
+        y: -0.50
         z: 0.05
         euler_x: 0.0
         euler_y: 0.0
