@@ -65,7 +65,7 @@ ur_task_manager:
       eef_frame: 'flange'
       finger_offset_x: 0.0
       finger_offset_y: 0.0
-      finger_offset_z: 0.01
+      finger_offset_z: 0.1
       axis_tolarance: 0.1
       simulation: false
 

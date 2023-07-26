@@ -262,7 +262,7 @@ void MTCPlanner::grab_from_side(std::string obj_to_pick, int start_stage, int en
     case pick_underarm::UNDERARM_PLACE:
         set_joint_goal("UNDERARM PRE PLACE", underarm_pre_place_angles);
         task_executor();
-        underarm_approach("UNDERARM APPROACH PLACE", "target");
+        underarm_approach("UNDERARM_APPROACH_PLACE", "target");
 	      rclcpp::sleep_for(sleep_time);
 	      gripper_open();        // Open the gripper here
 	      rclcpp::sleep_for(sleep_time);
@@ -273,7 +273,7 @@ void MTCPlanner::grab_from_side(std::string obj_to_pick, int start_stage, int en
 	      rclcpp::sleep_for(sleep_time);
 	      gripper_open();        // Open the gripper here
 	      rclcpp::sleep_for(sleep_time);
-        underarm_approach("UNDERARM APPROACH PLACE", "target");
+        underarm_approach("UNDERARM_APPROACH_PLACE", "target");
 	      rclcpp::sleep_for(sleep_time);
 	      gripper_close();       // close the gripper here
 	      rclcpp::sleep_for(sleep_time);
@@ -439,8 +439,8 @@ void MTCPlanner::underarm_approach(std::string task_name, std::string obj_to_pic
     double y_incs = (MTCPlanner::under_arm_approach_dists.pose.position.y)/2 ; 
     double z_incs = (MTCPlanner::under_arm_approach_dists.pose.position.z)/2 ; 
 
-  // Calculate the Bezier points
-  std::vector<geometry_msgs::msg::Pose> waypoints;
+    // Calculate the Bezier points
+    std::vector<geometry_msgs::msg::Pose> waypoints;
     geometry_msgs::msg::Pose intrm_pose ;
 
     intrm_pose.position.x = arm_pose.pose.position.x ;
@@ -535,6 +535,29 @@ void MTCPlanner::underarm_approach(std::string task_name, std::string obj_to_pic
 
     move_group_interface.computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
     move_group_interface.execute(trajectory);
+
+    // This is only when placing and retuning from the target to make sure the sample is placed vertically
+    if(task_name =="UNDERARM_APPROACH_PLACE" ){
+
+      rclcpp::sleep_for(sleep_time);
+
+      //clear the old waypoints
+      waypoints.clear();
+
+      waypoints.push_back(intrm_pose);
+      
+      intrm_pose.position.z -= finger_offset_z ;
+      waypoints.push_back(intrm_pose);
+
+      move_group_interface.computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
+      move_group_interface.execute(trajectory);
+
+      MTCPlanner::under_arm_approach_dists.pose.position.z += finger_offset_z ;
+
+    }
+
+
+
 
 }
 
