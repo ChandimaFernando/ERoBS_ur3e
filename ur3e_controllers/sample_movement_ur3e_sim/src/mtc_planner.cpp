@@ -443,8 +443,8 @@ void MTCPlanner::underarm_approach(std::string task_name, std::string obj_to_pic
   std::vector<geometry_msgs::msg::Pose> waypoints;
     geometry_msgs::msg::Pose intrm_pose ;
 
-    intrm_pose.position.x = tip_of_gripper_x ;
-    intrm_pose.position.y = tip_of_gripper_y ;
+    intrm_pose.position.x = arm_pose.pose.position.x ;
+    intrm_pose.position.y = arm_pose.pose.position.y ;
     intrm_pose.position.z = arm_pose.pose.position.z ;
 
     intrm_pose.orientation.w = arm_pose.pose.orientation.w ;
@@ -505,8 +505,8 @@ void MTCPlanner::underarm_approach(std::string task_name, std::string obj_to_pic
     // Calculate linear intermediate points for x and y directions
     for (double i = tip_of_gripper_y, j = tip_of_gripper_x ; std::abs(obj_y - i) > 0.00001; i += y_incs, j += x_incs) {
 
-        intrm_pose.position.x = j ;
-        intrm_pose.position.y = i ;
+        intrm_pose.position.x += x_incs ;
+        intrm_pose.position.y += y_incs ;
         RCLCPP_INFO(LOGGER, "intrm_pose.position.y : %f ", intrm_pose.position.y );  
         RCLCPP_INFO(LOGGER, "std::abs(obj_y - i)  : %f ", std::abs(obj_y - i) );  
         RCLCPP_INFO(LOGGER, "intrm_pose.position.x : %f ", intrm_pose.position.x );  
@@ -521,7 +521,7 @@ void MTCPlanner::underarm_approach(std::string task_name, std::string obj_to_pic
     intrm_pose.position.x += x_incs ;
 
     RCLCPP_INFO(LOGGER, "intrm_pose.position.x : %f ", intrm_pose.position.x );  
-    RCLCPP_INFO(LOGGER, "intrm_pose.position.y : %f ", intrm_pose.position.y);  
+        RCLCPP_INFO(LOGGER, "intrm_pose.position.y : %f ", intrm_pose.position.y);  
 
     waypoints.push_back(intrm_pose);
 
