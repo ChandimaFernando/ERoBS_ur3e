@@ -501,24 +501,32 @@ void MTCPlanner::underarm_approach(std::string task_name, std::string obj_to_pic
     //clear the old waypoints
     waypoints.clear();
 
-    // Do the same for z direction
-    // Calculate linear intermediate points for x and y directions
-    for (double i = tip_of_gripper_y, j = tip_of_gripper_x ; std::abs(obj_y - i) > 0.00001; i += y_incs, j += x_incs) {
+    // // Do the same for z direction
+    // // Calculate linear intermediate points for x and y directions
+    // for (double i = tip_of_gripper_y, j = tip_of_gripper_x ; std::abs(obj_y - i) > 0.00001; i += y_incs, j += x_incs) {
 
+    //     intrm_pose.position.x += x_incs ;
+    //     intrm_pose.position.y += y_incs ;
+    //     RCLCPP_INFO(LOGGER, "intrm_pose.position.y : %f ", intrm_pose.position.y );  
+    //     RCLCPP_INFO(LOGGER, "std::abs(obj_y - i)  : %f ", std::abs(obj_y - i) );  
+    //     RCLCPP_INFO(LOGGER, "intrm_pose.position.x : %f ", intrm_pose.position.x );  
+    //     RCLCPP_INFO(LOGGER, "intrm_pose.position.y : %f ", intrm_pose.position.y);  
+
+    //     waypoints.push_back(intrm_pose);
+    //     break ;
+    // }
+    
+    for(int i=0 ; i < 2 ; i++){
         intrm_pose.position.x += x_incs ;
         intrm_pose.position.y += y_incs ;
-        RCLCPP_INFO(LOGGER, "intrm_pose.position.y : %f ", intrm_pose.position.y );  
-        RCLCPP_INFO(LOGGER, "std::abs(obj_y - i)  : %f ", std::abs(obj_y - i) );  
-        RCLCPP_INFO(LOGGER, "intrm_pose.position.x : %f ", intrm_pose.position.x );  
-        RCLCPP_INFO(LOGGER, "intrm_pose.position.y : %f ", intrm_pose.position.y);  
-
         waypoints.push_back(intrm_pose);
-        break ;
+
     }
-    
-    // Add the waypoints, including the final point
-    intrm_pose.position.y += y_incs ;
-    intrm_pose.position.x += x_incs ;
+
+
+    // // Add the waypoints, including the final point
+    // intrm_pose.position.y += y_incs ;
+    // intrm_pose.position.x += x_incs ;
 
     RCLCPP_INFO(LOGGER, "intrm_pose.position.x : %f ", intrm_pose.position.x );  
         RCLCPP_INFO(LOGGER, "intrm_pose.position.y : %f ", intrm_pose.position.y);  
