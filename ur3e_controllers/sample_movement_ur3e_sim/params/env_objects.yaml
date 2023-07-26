@@ -7,7 +7,7 @@ ur_task_manager:
         type: 'CYLINDER'
         h: 0.1 # height
         r: 0.02 # radius
-        x: 0.16 #0.19 ->overhead 0.16->underarm
+        x: 10.16 #0.19 ->overhead 0.16->underarm
         y: -0.382 #-0.43 ->overhead -0.38 -> underarm
         z: 0.04 #0.017->overhead #0.04 ->underarm
         euler_x: 0.0
@@ -17,8 +17,8 @@ ur_task_manager:
         type: 'CYLINDER'
         h: 0.1 # height
         r: 0.02 # radius
-        x: 0.18
-        y: -0.50
+        x: 0.28 # correct: 0.18 
+        y: -0.60 # correct: -0.50 
         z: 0.04 
         euler_x: 0.0
         euler_y: 0.0
@@ -29,12 +29,12 @@ ur_task_manager:
         d: 0.1 # depth
         h: 0.01 # height
         #w: 0.0 # pose, orientation 
-        x: -0.21 # -0.15->ovehead -0.24->underarm
-        y: 0.31 # 0.34->overhead 0.33->underarm
+        x: -0.21 # -0.15->ovehead -0.24->underarm    -0.21
+        y: 0.41 # 0.34->overhead 0.33->underarm     0.31
         z: 0.11 # 0.04->overhead 0.11->underarm
         euler_x: 0.0
         euler_y: 0.0
-        euler_z: 45.0 # This is in degrees
+        euler_z: 5.0 # This is in degrees
       table:
         type: 'BOX'
         w: 2.0 # width

@@ -23,6 +23,10 @@
 
 #include "custom_msgs/srv/gripper_cmd.hpp"
 
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2/convert.h>
+#include <tf2/impl/utils.h>
+
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("mtc_fcns");
 using namespace std::chrono_literals;
 

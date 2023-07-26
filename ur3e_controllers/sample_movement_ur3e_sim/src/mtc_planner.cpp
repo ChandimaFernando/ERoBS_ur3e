@@ -5,7 +5,6 @@ MTCPlanner::MTCPlanner(const rclcpp::Node::SharedPtr& node)
 
 {
     node_ = node ;
-    // MTCPlanner::client_ = client ;
     MTCPlanner::client_ = node->create_client<custom_msgs::srv::GripperCmd>("gripper_service");
 
     initialize();
@@ -393,17 +392,25 @@ void MTCPlanner::underarm_approach(std::string task_name, std::string obj_to_pic
     geometry_msgs::msg::PoseStamped arm_pose ;
     arm_pose = MTCPlanner::get_eef_pose();
 
-    // Calculate distances to the target
-    double obj_x = node_->get_parameter("objects." + obj_to_pick + ".x").as_double() + hand_offset*sin(obj_yaw);
-    double obj_y = node_->get_parameter("objects." + obj_to_pick + ".y").as_double() + hand_offset*cos(obj_yaw);
+
+    tf2::Quaternion quaternion(arm_pose.pose.orientation.x, arm_pose.pose.orientation.y, arm_pose.pose.orientation.z, arm_pose.pose.orientation.w);
+    double arm_roll, arm_pitch, arm_yaw ;
+
+    tf2::Matrix3x3 m(quaternion);
+
+    m.getRPY(arm_roll, arm_pitch, arm_yaw);
+  
+    // Project the object closer rather than extending arm to account for the gripper 
+    double obj_x = node_->get_parameter("objects." + obj_to_pick + ".x").as_double() ; //+ hand_offset*sin(obj_yaw);
+    double obj_y = node_->get_parameter("objects." + obj_to_pick + ".y").as_double() ; //+ hand_offset*cos(obj_yaw);
     double obj_z = node_->get_parameter("objects." + obj_to_pick + ".z").as_double() ;
 
-    RCLCPP_INFO(LOGGER, "offset on x  : %f ", hand_offset*sin(obj_yaw));  
-    RCLCPP_INFO(LOGGER, "offset on y  : %f ", hand_offset*cos(obj_yaw));  
+    RCLCPP_INFO(LOGGER, "offset on x  : %f ", hand_offset*cos(arm_yaw));  
+    RCLCPP_INFO(LOGGER, "offset on y  : %f ", hand_offset*sin(arm_yaw) );  
 
-
-    MTCPlanner::under_arm_approach_dists.pose.position.x =  obj_x - (arm_pose.pose.position.x ) ;
-    MTCPlanner::under_arm_approach_dists.pose.position.y =  obj_y - (arm_pose.pose.position.y ) ;
+  // Calculate distances to the target
+    MTCPlanner::under_arm_approach_dists.pose.position.x =  obj_x - (arm_pose.pose.position.x + hand_offset*cos(arm_yaw) ) ;
+    MTCPlanner::under_arm_approach_dists.pose.position.y =  obj_y - (arm_pose.pose.position.y + hand_offset*sin(arm_yaw) ) ;
     MTCPlanner::under_arm_approach_dists.pose.position.z =  obj_z - (arm_pose.pose.position.z ) ;  
 
     RCLCPP_INFO(LOGGER, "obj_x : %f ", obj_x );  
@@ -412,6 +419,8 @@ void MTCPlanner::underarm_approach(std::string task_name, std::string obj_to_pic
 
     RCLCPP_INFO(LOGGER, "arm_pose.pose.position.x : %f ", arm_pose.pose.position.x );  
     RCLCPP_INFO(LOGGER, "arm_pose.pose.position.y : %f ", arm_pose.pose.position.y );  
+    RCLCPP_INFO(LOGGER, "arm_pose.pose.position.x  adjusted: %f ", arm_pose.pose.position.x + hand_offset*cos(arm_yaw));  
+    RCLCPP_INFO(LOGGER, "arm_pose.pose.position.y  adjusted: %f ", arm_pose.pose.position.y + hand_offset*sin(arm_yaw));      
     RCLCPP_INFO(LOGGER, "arm_pose.pose.position.z : %f ", arm_pose.pose.position.z );  
 
     RCLCPP_INFO(LOGGER, "MTCPlanner::under_arm_approach_dists.pose.position.x : %f ", MTCPlanner::under_arm_approach_dists.pose.position.x  );  
@@ -510,7 +519,7 @@ void MTCPlanner::underarm_approach(std::string task_name, std::string obj_to_pic
 
         RCLCPP_INFO(LOGGER, "intrm_pose.position.x : %f ", intrm_pose.position.x );  
         RCLCPP_INFO(LOGGER, "intrm_pose.position.y : %f ", intrm_pose.position.y);  
-        
+
     waypoints.push_back(intrm_pose);
 
     move_group_interface.computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
