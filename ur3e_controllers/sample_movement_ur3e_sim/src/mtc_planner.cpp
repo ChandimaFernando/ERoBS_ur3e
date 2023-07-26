@@ -514,8 +514,8 @@ void MTCPlanner::underarm_approach(std::string task_name, std::string obj_to_pic
     }
     
     // Add the waypoints, including the final point
-    intrm_pose.position.y = obj_y ;
-    intrm_pose.position.x = obj_x ;
+    intrm_pose.position.y += y_incs ;
+    intrm_pose.position.x += x_incs ;
 
         RCLCPP_INFO(LOGGER, "intrm_pose.position.x : %f ", intrm_pose.position.x );  
         RCLCPP_INFO(LOGGER, "intrm_pose.position.y : %f ", intrm_pose.position.y);  
