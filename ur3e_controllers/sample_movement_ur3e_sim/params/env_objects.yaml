@@ -55,7 +55,7 @@ ur_task_manager:
       top_pre_pick: [-3.9793507, -1.61251, -1.55614, -1.52612, 1.54078, 0.61959188 ] #overhead
       top_pre_place: [-0.8419468, -1.61251, -1.55614, -1.52612, 1.54078, 1.3796827]
       ##### Under arm pick up #######
-      underarm_pre_place: [-5.84301327, -2.00555784, -1.99665666, -2.05372893, 0.84159777, 2.993937]
+      underarm_pre_place: [-5.84301327, -1.99613307, -2.06350278, -1.99979826, 0.84159777, 2.9939378]
       underarm_base_rotation_for_return: [-2.58238916, -1.99613307, -2.06350278, -1.99979826, 0.60161499, 2.9939378]
       underarm_pre_pick: [-3.178942, -1.72124371, -2.43386164, -1.7376498, -0.154287106, 2.83022592] # The order of the angles has to be changes if the current results in collisions
       underarm_turn_angles: [-2.83319298, -2.05931398, -1.70431401, -2.57715317, -0.154287106, 3.16183847 ] # The order of the angles has to be changes if the current results in collisions
