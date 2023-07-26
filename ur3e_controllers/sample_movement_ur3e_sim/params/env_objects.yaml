@@ -30,7 +30,7 @@ ur_task_manager:
         h: 0.01 # height
         #w: 0.0 # pose, orientation 
         x: -0.21 # -0.15->ovehead -0.24->underarm    -0.21
-        y: 0.31 # 0.34->overhead 0.33->underarm     0.31
+        y: 0.36 # 0.34->overhead 0.33->underarm     0.31
         z: 0.11 # 0.04->overhead 0.11->underarm
         euler_x: 0.0
         euler_y: 0.0
