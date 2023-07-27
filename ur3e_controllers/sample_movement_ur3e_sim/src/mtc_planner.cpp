@@ -19,7 +19,8 @@ void MTCPlanner::initialize()
     underarm_turn_angles = node_->get_parameter("ur3e.underarm_turn_angles").as_double_array();
     underarm_pre_pick_angles = node_->get_parameter("ur3e.underarm_pre_pick").as_double_array();
     underarm_pre_place_angles = node_->get_parameter("ur3e.underarm_pre_place").as_double_array();   
-    underarm_base_rotation_for_return = node_->get_parameter("ur3e.underarm_base_rotation_for_return").as_double_array();   
+    underarm_base_rotation_for_return = node_->get_parameter("ur3e.underarm_base_rotation_for_return").as_double_array();
+    underarm_place = node_->get_parameter("ur3e.underarm_place").as_double_array();
     under_arm_joint_order = node_->get_parameter("ur3e.under_arm_joint_order").as_integer_array();
     if_simulation_ = node_->get_parameter("ur3e.simulation").as_bool();
 
@@ -273,7 +274,7 @@ void MTCPlanner::grab_from_side(std::string obj_to_pick, int start_stage, int en
 	      rclcpp::sleep_for(sleep_time);
 	      gripper_open();        // Open the gripper here
 	      rclcpp::sleep_for(sleep_time);
-        underarm_approach("UNDERARM_APPROACH_PLACE", "target");
+	underarm_approach("UNDERARM_APPROACH_PLACE", "target");
 	      rclcpp::sleep_for(sleep_time);
 	      gripper_close();       // close the gripper here
 	      rclcpp::sleep_for(sleep_time);
@@ -288,9 +289,10 @@ void MTCPlanner::grab_from_side(std::string obj_to_pick, int start_stage, int en
 
         set_joint_goal("UNDERARM PRE RETURN", underarm_base_rotation_for_return);
         task_executor();
-        set_joint_goal("UNDERARM PRE RETURN", underarm_pre_pick_angles);
+        set_joint_goal("UNDERARM PRE PICK", underarm_pre_pick_angles);
         task_executor();
-        underarm_approach("UNDERARM APPROACH RETURN", obj_to_pick);
+	set_joint_goal("UNDERARM PLACE", underarm_place);
+        //underarm_approach("UNDERARM APPROACH RETURN", obj_to_pick);
 	      rclcpp::sleep_for(sleep_time);
 	      gripper_open();                // open the gripper here
         // underarm_retreat("UNDERARM RETREAT", obj_to_pick);
