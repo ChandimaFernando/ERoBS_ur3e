@@ -261,7 +261,7 @@ void MTCPlanner::grab_from_side(std::string obj_to_pick, int start_stage, int en
         break;
 
     case pick_underarm::UNDERARM_PLACE:
-        set_joint_goal("UNDERARM PRE PLACE", underarm_pre_place_angles);
+        set_joint_goal("UNDERARM_PRE_PLACE", underarm_pre_place_angles);
         task_executor();
         underarm_approach("UNDERARM_APPROACH_PLACE", "target");
 	      rclcpp::sleep_for(sleep_time);
@@ -345,7 +345,7 @@ void MTCPlanner::set_joint_goal(std::string task_name, std::vector<double> home_
     int num_joints = MTCPlanner::joint_names.size();
 
     // This is to differentiate the sequence of which joint to turn in underarm turn vs other regular joint movements
-    if(task_name == "UNDERARM_POSE"){
+    if((task_name == "UNDERARM_POSE") || (task_name == "UNDERARM_PRE_PLACE")){
 
       for (int i = 0; i < num_joints ; i++){
           {
