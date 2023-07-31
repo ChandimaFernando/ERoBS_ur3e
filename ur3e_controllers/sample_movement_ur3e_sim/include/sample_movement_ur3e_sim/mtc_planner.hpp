@@ -77,9 +77,10 @@ class MTCPlanner
         std::vector<double> underarm_base_rotation_for_return ;
         /// @brief Places sample on position
         std::vector<double> underarm_place ;
+	/// @brief Rotates towards target position
+	std::vector<double> underarm_target ;
 
         std::vector<long int> under_arm_joint_order ;
-	std::vector<long int> underarm_joint_order ;
         /// @brief Holds sample location read from the params file
         std::vector<geometry_msgs::msg::Pose> sample_locations ; //= geometry_msgs::msg::Pose();
         geometry_msgs::msg::Pose taregt_location = geometry_msgs::msg::Pose();

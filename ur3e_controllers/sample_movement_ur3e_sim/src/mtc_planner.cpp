@@ -21,8 +21,8 @@ void MTCPlanner::initialize()
     underarm_pre_place_angles = node_->get_parameter("ur3e.underarm_pre_place").as_double_array();   
     underarm_base_rotation_for_return = node_->get_parameter("ur3e.underarm_base_rotation_for_return").as_double_array();
     underarm_place = node_->get_parameter("ur3e.underarm_place").as_double_array();
+    underarm_target = node_->get_parameter("ur3e.underarm_target").as_double_array();
     under_arm_joint_order = node_->get_parameter("ur3e.under_arm_joint_order").as_integer_array();
-    underarm_joint_order = node_->get_parameter("ur3e.underarm_joint_order").as_integer_array();
     if_simulation_ = node_->get_parameter("ur3e.simulation").as_bool();
 
 
@@ -262,6 +262,8 @@ void MTCPlanner::grab_from_side(std::string obj_to_pick, int start_stage, int en
         break;
 
     case pick_underarm::UNDERARM_PLACE:
+	set_joint_goal("UNDERARM_TARGET", underarm_target);
+	task_executor();
         set_joint_goal("UNDERARM_PRE_PLACE", underarm_pre_place_angles);
         task_executor();
         underarm_approach("UNDERARM_APPROACH_PLACE", "target");
@@ -290,18 +292,19 @@ void MTCPlanner::grab_from_side(std::string obj_to_pick, int start_stage, int en
 
         set_joint_goal("UNDERARM PRE RETURN", underarm_base_rotation_for_return);
         task_executor();
-        set_joint_goal("UNDERARM PRE PICK", underarm_pre_pick_angles);
-        task_executor();
+        //set_joint_goal("UNDERARM PRE PICK", underarm_pre_pick_angles);
+        //task_executor();
 	set_joint_goal("UNDERARM PLACE", underarm_place);
 	task_executor();
         //underarm_approach("UNDERARM APPROACH RETURN", obj_to_pick);
 	      rclcpp::sleep_for(sleep_time);
 	      gripper_open();                // open the gripper here
-        // underarm_retreat("UNDERARM RETREAT", obj_to_pick);
-        // task_executor();         
+	      rclcpp::sleep_for(sleep_time);
+        set_joint_goal("UNDERARM POSE", underarm_turn_angles);
+        task_executor();
         // // Move home after putting the sample back
-        // set_joint_goal("MOVE ARM HOME", rest_angles);
-        // task_executor();  
+        set_joint_goal("MOVE ARM HOME", rest_angles);
+        task_executor();  
         arm_at_home = true ;
 
         pick_underarm_enum_value = pick_underarm::UNDERARM_HOME ;
@@ -362,18 +365,6 @@ void MTCPlanner::set_joint_goal(std::string task_name, std::vector<double> home_
 
     }
 
-   else if((task_name == "UNDERARM_PRE_PLACE") || (task_name == "UNDERARM_PLACE")){
-	for (int i = 0; i < num_joints ; i++){
-          {
-              std::map<std::string, double> init_arm_pose{{joint_names[MTCPlanner::underarm_joint_order[i]], home_angle_list[MTCPlanner::under_arm_joint_order[i]]}};
-              auto stage_pose = std::make_unique<moveit::task_constructor::stages::MoveTo>("move"+joint_names[MTCPlanner::underarm_joint_order[i]], interpolation_planner);
-              stage_pose->setGroup(arm_group_name_);
-              stage_pose->setGoal(init_arm_pose);
-              MTCPlanner::task_.add(std::move(stage_pose));
-          }
-
-      }
-   }
 
     else{
 
