@@ -12,6 +12,7 @@ find_package(rosidl_default_generators REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/GripperCmd.srv"
   "srv/TaskCmd.srv"
+  "action/PickPlace.action"
 )
 
 # uncomment the following section in order to fill in

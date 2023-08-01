@@ -1,0 +1,7 @@
+string sample_name
+string target_name
+---
+bool success
+---
+int32[] completed_stages
+bool partial_success

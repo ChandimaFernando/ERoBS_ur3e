@@ -1,5 +1,7 @@
 #include "sample_movement_ur3e_sim/ur_task_manager.hpp"
 
+// This function will be replaced by the action server
+
 using moveit::planning_interface::MoveGroupInterface;
 
 URTaskManager::URTaskManager(const rclcpp::NodeOptions& options)
