@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'pickup_task_client = bluesky_interface_examples.pickup_task_client:main',
+            
         ],
     },
 )
