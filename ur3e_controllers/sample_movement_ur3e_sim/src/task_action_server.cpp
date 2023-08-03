@@ -1,17 +1,16 @@
 // #include "sample_movement_ur3e_sim/task_server.hpp"
 
-#include "action_tutorials_cpp/visibility_control.h"
-
 #include <rclcpp/rclcpp.hpp>
 #include <functional>
 #include <memory>
 #include <thread>
 
-#include "rclcpp_action/rclcpp_action.hpp"
-#include "rclcpp_components/register_node_macro.hpp"
+#include <rclcpp_action/rclcpp_action.hpp>
+#include <rclcpp_components/register_node_macro.hpp>
 
-#include "custom_msgs/action/pick_place.action"
+#include "custom_msgs/action/pick_place.hpp"
 
+#include "sample_movement_ur3e_sim/visibility_control.h"
 
 
 namespace sample_movement_ur3e_sim
@@ -22,14 +21,17 @@ public:
   using PickPlaceAct = custom_msgs::action::PickPlace;
   using GoalHandlePickPlaceAct = rclcpp_action::ServerGoalHandle<PickPlaceAct>;
 
-//   ACTION_TUTORIALS_CPP_PUBLIC
+  SAMPLE_MOVEMENT_UR3E_SIM_PUBLIC
   explicit TaskActionServer(const rclcpp::NodeOptions & options = rclcpp::NodeOptions())
-  : Node("pick_place_action_server", options)
+  : Node("task_action_server", options)
   {
     using namespace std::placeholders;
 
     this->action_server_ = rclcpp_action::create_server<PickPlaceAct>(
-      this,
+      this->get_node_base_interface(),
+      this->get_node_clock_interface(),
+      this->get_node_logging_interface(),
+      this->get_node_waitables_interface(),
       "pick_place_action",
       std::bind(&TaskActionServer::handle_goal, this, _1, _2),
       std::bind(&TaskActionServer::handle_cancel, this, _1),
@@ -39,15 +41,17 @@ public:
 private:
   rclcpp_action::Server<PickPlaceAct>::SharedPtr action_server_;
 
+  SAMPLE_MOVEMENT_UR3E_SIM_LOCAL
   rclcpp_action::GoalResponse handle_goal(
     const rclcpp_action::GoalUUID & uuid,
     std::shared_ptr<const PickPlaceAct::Goal> goal)
   {
-    RCLCPP_INFO(this->get_logger(), "Received goal request with sample %s", goal->sample_name.char());
+    RCLCPP_INFO(this->get_logger(), "Received goal request with sample %s", goal->sample_name.c_str());
     (void)uuid;
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
 
+  SAMPLE_MOVEMENT_UR3E_SIM_LOCAL
   rclcpp_action::CancelResponse handle_cancel(
     const std::shared_ptr<GoalHandlePickPlaceAct> goal_handle)
   {
@@ -56,6 +60,7 @@ private:
     return rclcpp_action::CancelResponse::ACCEPT;
   }
 
+  SAMPLE_MOVEMENT_UR3E_SIM_LOCAL
   void handle_accepted(const std::shared_ptr<GoalHandlePickPlaceAct> goal_handle)
   {
     using namespace std::placeholders;
@@ -63,13 +68,14 @@ private:
     std::thread{std::bind(&TaskActionServer::execute, this, _1), goal_handle}.detach();
   }
 
+  SAMPLE_MOVEMENT_UR3E_SIM_LOCAL
   void execute(const std::shared_ptr<GoalHandlePickPlaceAct> goal_handle)
   {
     RCLCPP_INFO(this->get_logger(), "Executing goal");
     rclcpp::Rate loop_rate(1);
     const auto goal = goal_handle->get_goal();
     auto feedback = std::make_shared<PickPlaceAct::Feedback>();
-    auto & sequence = feedback->partial_sequence;
+    // auto & sequence = feedback->partial_sequence;
     // sequence.push_back(0);
     // sequence.push_back(1);
     auto result = std::make_shared<PickPlaceAct::Result>();
