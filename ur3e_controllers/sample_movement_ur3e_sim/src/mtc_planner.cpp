@@ -22,6 +22,7 @@ void MTCPlanner::initialize()
     underarm_base_rotation_for_return = node_->get_parameter("ur3e.underarm_base_rotation_for_return").as_double_array();
     underarm_place = node_->get_parameter("ur3e.underarm_place").as_double_array();
     underarm_target = node_->get_parameter("ur3e.underarm_target").as_double_array();
+    underarm_backup = node_->get_parameter("ur3e.underarm_backup").as_double_array();
     under_arm_joint_order = node_->get_parameter("ur3e.under_arm_joint_order").as_integer_array();
     if_simulation_ = node_->get_parameter("ur3e.simulation").as_bool();
 
@@ -296,15 +297,17 @@ void MTCPlanner::grab_from_side(std::string obj_to_pick, int start_stage, int en
         //task_executor();
 	set_joint_goal("UNDERARM PLACE", underarm_place);
 	task_executor();
-        //underarm_approach("UNDERARM APPROACH RETURN", obj_to_pick);
-	      rclcpp::sleep_for(sleep_time);
-	      gripper_open();                // open the gripper here
-	      rclcpp::sleep_for(sleep_time);
+	rclcpp::sleep_for(sleep_time);
+        gripper_open();                // open the gripper here
+	rclcpp::sleep_for(sleep_time);
+        set_joint_goal("UNDERARM BACK UP", underarm_backup);
+	task_executor();
+	rclcpp::sleep_for(sleep_time);
         set_joint_goal("UNDERARM POSE", underarm_turn_angles);
         task_executor();
         // // Move home after putting the sample back
         set_joint_goal("MOVE ARM HOME", rest_angles);
-        task_executor();  
+        task_executor();
         arm_at_home = true ;
 
         pick_underarm_enum_value = pick_underarm::UNDERARM_HOME ;
@@ -546,7 +549,7 @@ void MTCPlanner::underarm_approach(std::string task_name, std::string obj_to_pic
     move_group_interface.execute(trajectory);
 
     // This is only when placing and retuning from the target to make sure the sample is placed vertically
-    if(task_name =="UNDERARM_APPROACH_PLACE" ){
+    if(task_name =="UNDERARM_APPROACH_PLACE"){
 
       rclcpp::sleep_for(sleep_time);
 

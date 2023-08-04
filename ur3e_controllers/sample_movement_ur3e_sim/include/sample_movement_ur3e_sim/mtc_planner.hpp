@@ -79,6 +79,8 @@ class MTCPlanner
         std::vector<double> underarm_place ;
 	/// @brief Rotates towards target position
 	std::vector<double> underarm_target ;
+	/// @brief Backs up from sample2
+	std::vector<double> underarm_backup ;
 
         std::vector<long int> under_arm_joint_order ;
         /// @brief Holds sample location read from the params file
