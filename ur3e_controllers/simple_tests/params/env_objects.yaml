@@ -1,0 +1,5 @@
+simple_params_node:
+  ros__parameters:
+    num_objects: 4
+ 
+
