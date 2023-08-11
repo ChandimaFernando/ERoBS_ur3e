@@ -10,7 +10,7 @@ class PickPlaceActionClient(Node):
 
     def __init__(self):
         super().__init__('fibonacci_action_client')
-        self._action_client = ActionClient(self, PickPlace, 'pick_place_action')
+        self._action_client = ActionClient(self, PickPlace, 'PickPlaceAct_task')
 
     def send_goal(self, order):
         goal_msg = PickPlace.Goal()

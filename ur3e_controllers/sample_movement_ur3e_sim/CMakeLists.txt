@@ -34,20 +34,22 @@ find_package(rclcpp_components REQUIRED)
 
 include_directories(include)
 
-# add_executable(sample_movement_ur3e_sim src/ur_task_manager.cpp src/mtc_planner.cpp)
+add_executable(sample_movement_ur3e_sim src/ur_task_manager.cpp src/mtc_planner.cpp)
 # add_executable(sample_place_publisher src/sample_movement_ur3e_sim.cpp)
+# add_executable(simple_actions src/simple_actions.cpp)
 
-# ament_target_dependencies(
-#   sample_movement_ur3e_sim 
-#   rclcpp
-#   moveit_core
-#   moveit_ros_planning
-#   moveit_ros_planning_interface
-#   moveit_visual_tools
-#   geometry_msgs
-#   moveit_task_constructor_core
-#   custom_msgs
-# )
+
+ament_target_dependencies(
+  sample_movement_ur3e_sim 
+  rclcpp
+  moveit_core
+  moveit_ros_planning
+  moveit_ros_planning_interface
+  moveit_visual_tools
+  geometry_msgs
+  moveit_task_constructor_core
+  custom_msgs
+)
 
 # ament_target_dependencies(
 #   sample_place_publisher
@@ -58,13 +60,13 @@ include_directories(include)
 
 
 
-# target_include_directories(sample_movement_ur3e_sim PUBLIC
-#   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-#   $<INSTALL_INTERFACE:include>)
-# target_compile_features(sample_movement_ur3e_sim PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+target_include_directories(sample_movement_ur3e_sim PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+target_compile_features(sample_movement_ur3e_sim PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 
-# install(TARGETS sample_movement_ur3e_sim
-#   DESTINATION lib/${PROJECT_NAME})
+install(TARGETS sample_movement_ur3e_sim
+  DESTINATION lib/${PROJECT_NAME})
 
 
 # target_include_directories(sample_place_publisher PUBLIC
@@ -76,31 +78,44 @@ include_directories(include)
 #   DESTINATION lib/${PROJECT_NAME})
 
 
-add_library(task_server SHARED 
-  src/task_action_server.cpp)
+# add_executable(task_server src/task_action_server.cpp)
 
-rclcpp_components_register_node(task_server PLUGIN "sample_movement_ur3e_sim::TaskActionServer" EXECUTABLE task_action_server)
+# add_library(task_server SHARED 
+#   src/task_action_server.cpp)
 
-target_compile_definitions(task_server
-  PRIVATE "SAMPLE_MOVEMENT_UR3E_SIM_BUILDING_DLL")
-ament_target_dependencies(
-  task_server
-  rclcpp
-  rclcpp_action
-  rclcpp_components
-  custom_msgs
-)
+# rclcpp_components_register_node(task_server PLUGIN "sample_movement_ur3e_sim::TaskActionServer" EXECUTABLE task_action_server)
 
-install(TARGETS
-  task_server
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
-  )
+# target_compile_definitions(task_server
+#   PRIVATE "SAMPLE_MOVEMENT_UR3E_SIM_BUILDING_DLL")
+# ament_target_dependencies(
+#   task_server
+#   rclcpp
+#   rclcpp_action
+#   rclcpp_components
+#   moveit_core
+#   moveit_ros_planning
+#   moveit_ros_planning_interface
+#   moveit_visual_tools
+#   geometry_msgs
+#   moveit_task_constructor_core
+#   custom_msgs
+# )
 
-# target_include_directories(task_server PRIVATE
+# install(TARGETS
+#   task_server
+#   ARCHIVE DESTINATION lib
+#   LIBRARY DESTINATION lib
+#   RUNTIME DESTINATION bin
+#   )
+
+# target_include_directories(task_server PUBLIC
 #   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 #   $<INSTALL_INTERFACE:include>)
+#   target_compile_features(task_server PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+
+
+# install(TARGETS task_server
+#   DESTINATION lib/${PROJECT_NAME})
 
 
   install(

@@ -207,7 +207,7 @@ int main(int argc, char* argv[])
     // Draw and move the robot
     draw_trajectory_tool_path(plan.trajectory_);
     moveit_visual_tools.trigger();
-  //  move_group_interface.execute(plan);
+   move_group_interface.execute(plan);
 
   }
   else

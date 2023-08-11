@@ -142,6 +142,19 @@ def generate_launch_description():
 
     # pdb.set_trace()
 
+    # # MTC Demo node
+    # pick_place_demo = Node(
+    #     package="sample_movement_ur3e_sim",
+    #     executable="sample_movement_ur3e_sim",
+    #     output="screen",
+    #     parameters=[
+    #             robot_description,
+    #             robot_description_semantic,
+    #             robot_description_kinematics,
+    #             param_file,
+    #     ],
+    # )
+
     # MTC Demo node
     pick_place_demo = Node(
         package="sample_movement_ur3e_sim",
