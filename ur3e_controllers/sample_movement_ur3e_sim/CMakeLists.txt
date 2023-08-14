@@ -24,7 +24,8 @@ find_package(rclcpp_components REQUIRED)
 
 include_directories(include)
 
-add_executable(sample_movement_ur3e_sim src/ur_task_manager.cpp src/mtc_planner.cpp)
+# add_executable(sample_movement_ur3e_sim src/ur_task_manager_sim.cpp src/mtc_planner.cpp)
+add_executable(sample_movement_ur3e_sim src/ur_action_client.cpp src/mtc_planner.cpp)
 add_executable(sample_place_publisher src/sample_movement_ur3e_sim.cpp)
 add_executable(task_server src/task_server.cpp)
 

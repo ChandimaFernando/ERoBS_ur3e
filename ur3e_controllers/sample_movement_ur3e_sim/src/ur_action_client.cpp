@@ -1,19 +1,37 @@
-#include "sample_movement_ur3e_sim/ur_task_manager.hpp"
+#include "sample_movement_ur3e_sim/ur_action_client.hpp"
 
 // This function will be replaced by the action server
 
 using moveit::planning_interface::MoveGroupInterface;
+using PickPlaceAct = custom_msgs::action::PickPlace;
+using GoalHandlePickPlaceAct = rclcpp_action::ServerGoalHandle<PickPlaceAct>;
 
 URTaskManager::URTaskManager(const rclcpp::NodeOptions& options)
-  : node_{ std::make_shared<rclcpp::Node>("ur_task_manager", options) }
+  : Node("ur_server") , node_{ std::make_shared<rclcpp::Node>("ur_task_manager", options) }
 {
   
-  create_nodes();
-  create_env();
+  action_server_ = rclcpp_action::create_server<PickPlaceAct>(
+      node_->get_node_base_interface(),
+      node_->get_node_clock_interface(),
+      node_->get_node_logging_interface(),
+      node_->get_node_waitables_interface(),
+    "pick_place_action",
+    std::bind(&URTaskManager::handle_goal, this, std::placeholders::_1,std::placeholders::_2),
+    std::bind(&URTaskManager::handle_cancel, this, std::placeholders::_1),
+    std::bind(&URTaskManager::handle_accepted, this, std::placeholders::_1));
+
+  // create_nodes();
+  // create_env();
 
   subscription_ = node_->create_subscription<geometry_msgs::msg::Pose>(
       "sample_pose", 10, std::bind(&URTaskManager::sample_pose_change_cb, this, std::placeholders::_1));
   
+  URTaskManager::move_group_interface_ = new MoveGroupInterface(node_, "ur_arm");
+    URTaskManager::planning_scene_interface = new moveit::planning_interface::PlanningSceneInterface() ;
+
+create_env();
+
+  URTaskManager::mtc_planner_node_ = new MTCPlanner(node_);
 
 }  
 
@@ -22,6 +40,46 @@ rclcpp::node_interfaces::NodeBaseInterface::SharedPtr URTaskManager::getNodeBase
   return node_->get_node_base_interface();
 }
 
+rclcpp_action::GoalResponse URTaskManager::handle_goal(
+  const rclcpp_action::GoalUUID & uuid,
+  std::shared_ptr<const PickPlaceAct::Goal> goal)
+{
+  // RCLCPP_INFO(this->get_logger(), "Received goal request with sample %s", goal->sample_name.c_str());
+  (void)uuid;
+  return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
+}
+
+rclcpp_action::CancelResponse URTaskManager::handle_cancel(
+  const std::shared_ptr<GoalHandlePickPlaceAct> goal_handle)
+{
+  // RCLCPP_INFO(this->get_logger(), "Received request to cancel goal");
+  (void)goal_handle;
+  return rclcpp_action::CancelResponse::ACCEPT;
+}
+
+void URTaskManager::handle_accepted(const std::shared_ptr<GoalHandlePickPlaceAct> goal_handle)
+{
+  using namespace std::placeholders;
+  // this needs to return quickly to avoid blocking the executor, so spin up a new thread
+  std::thread{std::bind(&URTaskManager::execute, this, _1), goal_handle}.detach();
+}
+
+void URTaskManager::execute(const std::shared_ptr<GoalHandlePickPlaceAct> goal_handle)
+{
+  // RCLCPP_INFO(node_->get_logger(), "Executing goal");
+  std::cout << "goal executing" << std::endl ;
+  rclcpp::Rate loop_rate(1);
+  const auto goal = goal_handle->get_goal();    
+  
+  // URTaskManager::mtc_planner_node_->grab_from_top(goal->sample_name, 0, 2);
+  
+  auto feedback = std::make_shared<PickPlaceAct::Feedback>();
+  // auto & sequence = feedback->partial_sequence;
+  // sequence.push_back(0);
+  // sequence.push_back(1);
+  auto result = std::make_shared<PickPlaceAct::Result>();
+
+}
 
 void URTaskManager::create_nodes(){
 

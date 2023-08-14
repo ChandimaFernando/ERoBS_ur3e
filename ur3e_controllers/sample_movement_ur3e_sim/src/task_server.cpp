@@ -1,6 +1,6 @@
 // #include "sample_movement_ur3e_sim/task_server.hpp"
 
-#include "action_tutorials_cpp/visibility_control.h"
+#include "sample_movement_ur3e_sim/visibility_control.h"
 
 #include <rclcpp/rclcpp.hpp>
 #include <functional>
@@ -10,12 +10,10 @@
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "rclcpp_components/register_node_macro.hpp"
 
-#include "custom_msgs/action/pick_place.action"
+#include "custom_msgs/action/pick_place.hpp"
 
-
-
-namespace sample_movement_ur3e_sim
-{
+// namespace sample_movement_ur3e_sim
+// {
 class TaskActionServer : public rclcpp::Node
 {
 public:
@@ -43,7 +41,7 @@ private:
     const rclcpp_action::GoalUUID & uuid,
     std::shared_ptr<const PickPlaceAct::Goal> goal)
   {
-    RCLCPP_INFO(this->get_logger(), "Received goal request with sample %s", goal->sample_name.char());
+    RCLCPP_INFO(this->get_logger(), "Received goal request with sample %s", goal->sample_name.c_str());
     (void)uuid;
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
@@ -66,13 +64,13 @@ private:
   void execute(const std::shared_ptr<GoalHandlePickPlaceAct> goal_handle)
   {
     RCLCPP_INFO(this->get_logger(), "Executing goal");
-    rclcpp::Rate loop_rate(1);
-    const auto goal = goal_handle->get_goal();
-    auto feedback = std::make_shared<PickPlaceAct::Feedback>();
-    auto & sequence = feedback->partial_sequence;
-    // sequence.push_back(0);
-    // sequence.push_back(1);
-    auto result = std::make_shared<PickPlaceAct::Result>();
+    // rclcpp::Rate loop_rate(1);
+    // const auto goal = goal_handle->get_goal();
+    // auto feedback = std::make_shared<PickPlaceAct::Feedback>();
+    // auto & sequence = feedback->partial_sequence;
+    // // sequence.push_back(0);
+    // // sequence.push_back(1);
+    // auto result = std::make_shared<PickPlaceAct::Result>();
 
     // ############ This should have the fucntions for executing the pick up planner ####################
     // for (int i = 1; (i < goal->order) && rclcpp::ok(); ++i) {
@@ -101,6 +99,30 @@ private:
   }
 };  // class TaskActionServer
 
-}  // namespace action_tutorials_cpp
+// }  // namespace action_tutorials_cpp
 
-RCLCPP_COMPONENTS_REGISTER_NODE(sample_movement_ur3e_sim::TaskActionServer)
+int main(int argc, char *argv[])
+{
+  rclcpp::init(argc, argv);
+
+  // Create the ROS node and execute it in a thread.
+  rclcpp::NodeOptions options;
+  options.automatically_declare_parameters_from_overrides(true);
+
+  auto task_node = std::make_shared<TaskActionServer>(options);
+  rclcpp::executors::MultiThreadedExecutor executor;
+
+  auto spin_thread = std::make_unique<std::thread>([&executor, &task_node]()
+  {
+    executor.add_node(task_node->get_node_base_interface());
+    executor.spin();
+    executor.remove_node(task_node->get_node_base_interface()); 
+  });
+
+  
+  spin_thread->join();
+  rclcpp::shutdown();
+  return 0;
+}
+
+// RCLCPP_COMPONENTS_REGISTER_NODE(sample_movement_ur3e_sim::TaskActionServer)
