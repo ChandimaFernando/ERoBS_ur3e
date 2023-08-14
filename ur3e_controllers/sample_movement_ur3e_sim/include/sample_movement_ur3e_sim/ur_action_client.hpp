@@ -23,7 +23,7 @@
 #include <tf2/convert.h>
 #include <tf2/impl/utils.h>
 
-class URTaskManager : public rclcpp::Node
+class URTaskManager
 {
 
     using PickPlaceAct = custom_msgs::action::PickPlace;
@@ -33,11 +33,8 @@ class URTaskManager : public rclcpp::Node
     URTaskManager(const rclcpp::NodeOptions& options);
 
     rclcpp::node_interfaces::NodeBaseInterface::SharedPtr getNodeBaseInterface();
-    /// @brief constructs the planning environment by going through the param file
-    void create_env() ;
-    // rcl_interfaces::msg::SetParametersResult param_change_callback(const std::vector<rclcpp::Parameter> &parameters);
-    /// @brief interface to manage the obstacle environment
-    moveit::planning_interface::PlanningSceneInterface *planning_scene_interface;
+
+
     // std::vector<moveit_msgs::msg::CollisionObject> collision_ojbects ;
 
 
@@ -45,16 +42,11 @@ class URTaskManager : public rclcpp::Node
   private:
     static const rclcpp::Logger LOGGER; 
     rclcpp::Node::SharedPtr node_;
-
-    moveit::planning_interface::MoveGroupInterface *move_group_interface_ ;
     
     moveit_visual_tools::MoveItVisualTools *moveit_visual_tools_ ;
     MTCPlanner *mtc_planner_node_ ;
 
     const moveit::core::JointModelGroup *jmg_ ;
-
-    /// @brief This maps the collision ojbect type to an integer to be used in switch statement.
-    std::map<std::string, int> obj_type_map ;
 
     // Record pose of the enf effector
     double eef_pose_x ;

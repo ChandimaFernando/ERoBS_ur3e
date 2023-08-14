@@ -1,13 +1,26 @@
 #include "sample_movement_ur3e_sim/mtc_planner.hpp"
 
+using moveit::planning_interface::MoveGroupInterface;
+
 // MTCPlanner::MTCPlanner(const rclcpp::Node::SharedPtr& node, const rclcpp::Client<custom_msgs::srv::GripperCmd>::SharedPtr& client )
 MTCPlanner::MTCPlanner(const rclcpp::Node::SharedPtr& node)
 
 {
+    // Assign the passed node
     node_ = node ;
-    MTCPlanner::client_ = node->create_client<custom_msgs::srv::GripperCmd>("gripper_service");
 
-    initialize();
+    // Create gripper client
+    MTCPlanner::client_ = node_->create_client<custom_msgs::srv::GripperCmd>("gripper_service");
+
+    // Initialize tf buffer to get hand coordinates
+    tf_buffer_ = std::make_unique<tf2_ros::Buffer>(node_->get_clock());
+    tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
+
+    MTCPlanner::move_group_interface_ = new MoveGroupInterface(node_, "ur_arm");
+    MTCPlanner::planning_scene_interface = new moveit::planning_interface::PlanningSceneInterface() ;
+
+
+    // initialize();
 }
 
 void MTCPlanner::initialize()
@@ -60,9 +73,71 @@ void MTCPlanner::initialize()
 
     }
 
-    tf_buffer_ = std::make_unique<tf2_ros::Buffer>(node_->get_clock());
-    tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
 
+}
+
+
+void MTCPlanner::create_env() 
+{
+
+  MTCPlanner::obj_type_map.insert(std::pair<std::string, int>("CYLINDER",1));
+  MTCPlanner::obj_type_map.insert(std::pair<std::string, int>("BOX",2));
+
+  int num_objects = node_->get_parameter("num_objects").as_int();
+  std::vector<std::string> object_names =  node_->get_parameter("object_names").as_string_array();
+
+  std::vector<moveit_msgs::msg::CollisionObject> all_objects ;
+
+  // Create objects in a recursion
+  for(int i = 0 ; i < num_objects ; i++){
+  
+    std::string name = object_names[i]; //get each name here as it uses as a parameter field
+
+    moveit_msgs::msg::CollisionObject obj ; // collision object
+    geometry_msgs::msg::Pose pose; // object pose
+    obj.id = name ;
+    obj.header.frame_id = "world";
+
+    // Map to the correct int 
+    switch (MTCPlanner::obj_type_map[node_->get_parameter("objects." + name + ".type").as_string()])
+    {
+      case 1:
+        // These objects are cylinders
+        obj.primitives.resize(1);
+        obj.primitives[0].type = shape_msgs::msg::SolidPrimitive::CYLINDER;
+        // Populate the fields from the parameters
+        obj.primitives[0].dimensions = { node_->get_parameter("objects." + name + ".h").as_double() , 
+                                          node_->get_parameter("objects." + name + ".r").as_double() };
+
+        pose.position.x = node_->get_parameter("objects." + name + ".x").as_double() ;
+        pose.position.y = node_->get_parameter("objects." + name + ".y").as_double() ;
+        pose.position.z = node_->get_parameter("objects." + name + ".z").as_double() ;
+        obj.pose = pose ;
+
+        break;
+      
+      case 2:
+        obj.primitives.resize(1);
+        obj.primitives[0].type = shape_msgs::msg::SolidPrimitive::BOX;
+        obj.primitives[0].dimensions = { node_->get_parameter("objects." + name + ".w").as_double() , 
+                                          node_->get_parameter("objects." + name + ".d").as_double() ,
+                                          node_->get_parameter("objects." + name + ".h").as_double() };
+
+        pose.position.x = node_->get_parameter("objects." + name + ".x").as_double() ;
+        pose.position.y = node_->get_parameter("objects." + name + ".y").as_double() ;
+        pose.position.z = node_->get_parameter("objects." + name + ".z").as_double() ;
+        obj.pose = pose ;
+
+      default:
+        break;
+    }
+
+    all_objects.push_back(obj);
+
+  }
+
+    MTCPlanner::planning_scene_interface->applyCollisionObjects(all_objects);
+    all_objects.clear();
 }
 
 void MTCPlanner::task_executor(){

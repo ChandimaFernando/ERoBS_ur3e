@@ -50,12 +50,20 @@ class MTCPlanner
         void gripper_close();
         void gripper_activate();
 
+        /// @brief constructs the planning environment by going through the param file
+        void create_env() ;
 
     private:
 
         rclcpp::Node::SharedPtr node_;
-        // moveit::planning_interface::MoveGroupInterface *move_group_intrfc_ ;
+
+        moveit::planning_interface::MoveGroupInterface *move_group_interface_ ;
+
         rclcpp::Client<custom_msgs::srv::GripperCmd>::SharedPtr client_;
+
+        // rcl_interfaces::msg::SetParametersResult param_change_callback(const std::vector<rclcpp::Parameter> &parameters);
+        /// @brief interface to manage the obstacle environment
+        moveit::planning_interface::PlanningSceneInterface *planning_scene_interface;
 
         /// @brief Global variable to assign and pass each task
         moveit::task_constructor::Task task_;
@@ -78,8 +86,11 @@ class MTCPlanner
         /// @brief Places sample on position
         std::vector<double> underarm_place ;
 
+        /// @brief This maps the collision ojbect type to an integer to be used in switch statement.
+        std::map<std::string, int> obj_type_map ;
+
         std::vector<long int> under_arm_joint_order ;
-	std::vector<long int> underarm_joint_order ;
+	    std::vector<long int> underarm_joint_order ;
         /// @brief Holds sample location read from the params file
         std::vector<geometry_msgs::msg::Pose> sample_locations ; //= geometry_msgs::msg::Pose();
         geometry_msgs::msg::Pose taregt_location = geometry_msgs::msg::Pose();
