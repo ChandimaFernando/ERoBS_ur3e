@@ -52,6 +52,7 @@ class MTCPlanner
 
         /// @brief constructs the planning environment by going through the param file
         void create_env() ;
+        double get_completion_precentage();
 
     private:
 
@@ -86,6 +87,10 @@ class MTCPlanner
         /// @brief Places sample on position
         std::vector<double> underarm_place ;
 
+        int over_arm_stages_ ;
+        int under_arm_stages_ ;
+        int completed_stages_ ;
+
         /// @brief This maps the collision ojbect type to an integer to be used in switch statement.
         std::map<std::string, int> obj_type_map ;
 
@@ -113,6 +118,9 @@ class MTCPlanner
         // Delete the irrelevent onces later
         double finger_offset_x , finger_offset_y,  finger_offset_z ;
 
+
+        /// @brief OVER_ARM or UNDER_ARM to denote which pickup was called
+        std::string pickup_option_ = "" ;
 
         /// @brief 
         enum class pick_overarm{
