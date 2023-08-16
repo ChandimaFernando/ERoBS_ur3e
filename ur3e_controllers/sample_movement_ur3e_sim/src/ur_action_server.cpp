@@ -1,4 +1,4 @@
-#include "sample_movement_ur3e_sim/ur_action_client.hpp"
+#include "sample_movement_ur3e_sim/ur_action_server.hpp"
 
 // This function will be replaced by the action server
 
@@ -22,8 +22,10 @@ URTaskManager::URTaskManager(const rclcpp::NodeOptions& options)
 
 // create_env();
 
-  URTaskManager::mtc_planner_node_ = new MTCPlanner(node_);
-  URTaskManager::mtc_planner_node_->create_env();
+  // Add make shared 
+  mtc_planner_node_ = new MTCPlanner(node_);
+
+  mtc_planner_node_->create_env();
 
 }  
 
@@ -36,15 +38,34 @@ rclcpp_action::GoalResponse URTaskManager::handle_goal(
   const rclcpp_action::GoalUUID & uuid,
   std::shared_ptr<const PickPlaceAct::Goal> goal)
 {
-  // RCLCPP_INFO(this->get_logger(), "Received goal request with sample %s", goal->sample_name.c_str());
   (void)uuid;
-  return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
+  // RCLCPP_INFO(this->get_logger(), "Received goal request with sample %s", goal->sample_name.c_str());
+  rclcpp_action::GoalResponse response ; 
+  std::string sample_name = goal->sample_name ;
+  const std::vector<std::string> parameter_names = URTaskManager::node_->get_parameter("object_names").as_string_array();
+
+  // Checks if the sample name is valid and maps to a name in the yaml file
+  auto it = std::find(parameter_names.begin(), parameter_names.end(), sample_name);
+
+  if (it != parameter_names.end()) {
+      RCLCPP_INFO(LOGGER_AS, "Sample %s is available to pick, goal accepted",sample_name.c_str() );
+      response = rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE ;
+
+  } else {
+      RCLCPP_INFO(LOGGER_AS, "Sample %s is not available to pick, goal rejected",sample_name.c_str() );
+      response = rclcpp_action::GoalResponse::REJECT ;
+  }
+
+  // URTaskManager::mtc_planner_node_->grab_from_top(goal->sample_name);
+  return response ;
+  // return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
 }
 
 rclcpp_action::CancelResponse URTaskManager::handle_cancel(
   const std::shared_ptr<GoalHandlePickPlaceAct> goal_handle)
 {
-  // RCLCPP_INFO(this->get_logger(), "Received request to cancel goal");
+  RCLCPP_INFO(LOGGER_AS, "Received request to cancel goal");
+
   (void)goal_handle;
   return rclcpp_action::CancelResponse::ACCEPT;
 }
@@ -60,16 +81,45 @@ void URTaskManager::execute(const std::shared_ptr<GoalHandlePickPlaceAct> goal_h
 {
   // RCLCPP_INFO(node_->get_logger(), "Executing goal");
   std::cout << "goal executing" << std::endl ;
-  rclcpp::Rate loop_rate(1);
+  rclcpp::Rate loop_rate(2);
   const auto goal = goal_handle->get_goal();    
   
-  // URTaskManager::mtc_planner_node_->grab_from_top(goal->sample_name, 0, 2);
-  
+  std::string sample_name = goal->sample_name ;
+  std::string pickup_option_cmd = goal->pickup_options ;
+
+  if (pickup_options_.find(pickup_option_cmd) != pickup_options_.end()) {
+      int value = pickup_options_[pickup_option_cmd];
+      switch (value) {
+          case 1:
+              RCLCPP_INFO(LOGGER_AS, " %s pick up initiated for sample %s .",pickup_option_cmd.c_str(), sample_name.c_str() );
+              URTaskManager::mtc_planner_node_->grab_from_top(goal->sample_name,0,1);
+              break;
+          case 2:
+              RCLCPP_INFO(LOGGER_AS, " %s pick up initiated for sample %s .",pickup_option_cmd.c_str(), sample_name.c_str() );
+              URTaskManager::mtc_planner_node_->grab_from_side(goal->sample_name,0,1);
+              break;
+          default:
+              std::cout << "Selected fruit is not recognized" << std::endl;
+              break;
+      }
+  } else {
+    RCLCPP_INFO(LOGGER_AS, "Pickup option %s is either invalid or not coded to the map.",pickup_option_cmd.c_str());
+  }
+
+  // Completion percentage feedback
   auto feedback = std::make_shared<PickPlaceAct::Feedback>();
-  // auto & sequence = feedback->partial_sequence;
-  // sequence.push_back(0);
-  // sequence.push_back(1);
-  auto result = std::make_shared<PickPlaceAct::Result>();
+  while (URTaskManager::mtc_planner_node_->get_completion_precentage() < 100.00){
+
+    feedback->completed_precentages =  URTaskManager::mtc_planner_node_->get_completion_precentage();
+    goal_handle->publish_feedback(feedback);
+    loop_rate.sleep();
+
+  }
+  
+  if (URTaskManager::mtc_planner_node_->get_completion_precentage() - 100.00 <= 0.0000001 ){
+    auto result = std::make_shared<PickPlaceAct::Result>();
+    goal_handle->succeed(result);
+  }
 
 }
 
@@ -136,9 +186,8 @@ int main(int argc, char *argv[])
   {
     executor.add_node(ur_task_mng_node->getNodeBaseInterface());
     executor.spin();
-    // executor.remove_node(ur_task_mng_node->getNodeBaseInterface()); 
+    executor.remove_node(ur_task_mng_node->getNodeBaseInterface()); 
   });
-
   
   spin_thread->join();
   rclcpp::shutdown();

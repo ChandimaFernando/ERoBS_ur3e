@@ -9,7 +9,7 @@ from custom_msgs.action import PickPlace
 class PickPlaceActionClient(Node):
 
     def __init__(self):
-        super().__init__('fibonacci_action_client')
+        super().__init__('erobs_action_client')
         self._action_client = ActionClient(self, PickPlace, 'pick_place_action')
 
     def send_goal(self, order):

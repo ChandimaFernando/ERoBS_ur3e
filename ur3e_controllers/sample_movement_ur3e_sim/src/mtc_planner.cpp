@@ -37,6 +37,8 @@ void MTCPlanner::initialize()
     under_arm_joint_order = node_->get_parameter("ur3e.under_arm_joint_order").as_integer_array();
     underarm_joint_order = node_->get_parameter("ur3e.underarm_joint_order").as_integer_array();
     if_simulation_ = node_->get_parameter("ur3e.simulation").as_bool();
+    over_arm_stages_ = node_->get_parameter("over_arm_stages").as_int();
+    under_arm_stages_ = node_->get_parameter("under_arm_stages").as_int();
 
 
     base_frame = node_->get_parameter("ur3e.base_frame").as_string();
@@ -101,6 +103,7 @@ void MTCPlanner::create_env()
     // Map to the correct int 
     switch (MTCPlanner::obj_type_map[node_->get_parameter("objects." + name + ".type").as_string()])
     {
+      // Change these to enums 
       case 1:
         // These objects are cylinders
         obj.primitives.resize(1);
@@ -172,8 +175,12 @@ void MTCPlanner::task_executor(){
 void MTCPlanner::grab_from_top(std::string obj_to_pick, int start_stage, int end_stage)
 {
 
+    pickup_option_ = "OVER_ARM" ;
     std::chrono::nanoseconds sleep_time = 3000ms ;
     rclcpp::sleep_for(sleep_time);
+    completed_stages_ = 0 ;
+
+
 
     // for (int i = static_cast<int>(pick_overarm::OVERARM_HOME) ; i <= static_cast<int>(pick_overarm::OVERARM_RETURNED) ; i++)
     for (int i = start_stage ; i <= end_stage ; i++)
@@ -188,9 +195,11 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick, int start_stage, int end
         if(!arm_at_home){
             RCLCPP_INFO(LOGGER, "Inside pick_overarm::OVERARM_HOME "); 
             gripper_open();
+            completed_stages_ ++ ;
             rclcpp::sleep_for(sleep_time);
             set_joint_goal("MOVE ARM HOME", rest_angles);
             task_executor();
+            completed_stages_ ++ ;
             rclcpp::sleep_for(sleep_time);
 
             arm_at_home = true ;
@@ -203,13 +212,18 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick, int start_stage, int end
         RCLCPP_INFO(LOGGER, "Inside pick_overarm::OVERARM_PICK ");  
         set_joint_goal("TOP PRE PICK", top_pre_pick_angles);
         task_executor();
+        completed_stages_ ++ ;
         rclcpp::sleep_for(sleep_time);
         gripper_open();
+        completed_stages_ ++ ;
         top_approach("TOP APPROACH PICK", obj_to_pick);
+        completed_stages_ ++ ;
         rclcpp::sleep_for(sleep_time);
         gripper_close();
+        completed_stages_ ++ ;
         rclcpp::sleep_for(sleep_time);
         top_retreat("TOP RETREAT");
+        completed_stages_ ++ ;
         rclcpp::sleep_for(sleep_time);
 
         // pick_overarm_enum_value = pick_overarm::OVERARM_PLACE ;
@@ -219,24 +233,33 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick, int start_stage, int end
         RCLCPP_INFO(LOGGER, "Inside pick_overarm::OVERARM_PLACE ");  
         set_joint_goal("TOP PRE PLCE", top_pre_place_angles);
         task_executor();
+        completed_stages_ ++ ;
         rclcpp::sleep_for(sleep_time);
         top_approach("TOP APPROACH PLACE", "target");
+        completed_stages_ ++ ;
         rclcpp::sleep_for(sleep_time);
         gripper_open();
+        completed_stages_ ++ ;
         rclcpp::sleep_for(sleep_time);
         top_retreat("TOP RETREAT");
+        completed_stages_ ++ ;
         rclcpp::sleep_for(sleep_time);
         gripper_close();
+        completed_stages_ ++ ;
         rclcpp::sleep_for(sleep_time);
 
         // Next set of lines are to retreat the placed sample
         gripper_open();
+        completed_stages_ ++ ;
         rclcpp::sleep_for(sleep_time);
         top_approach("TOP APPROACH PLACE", "target");
+        completed_stages_ ++ ;
         rclcpp::sleep_for(sleep_time);
         gripper_close();
+        completed_stages_ ++ ;
         rclcpp::sleep_for(sleep_time);
         top_retreat("TOP RETREAT");
+        completed_stages_ ++ ;
 
         // pick_overarm_enum_value = pick_overarm::OVERARM_RETURNED ;
         break;
@@ -247,18 +270,24 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick, int start_stage, int end
         rclcpp::sleep_for(sleep_time);
         set_joint_goal("TOP PRE RETURN", top_pre_pick_angles);
         task_executor();
+        completed_stages_ ++ ;
         rclcpp::sleep_for(sleep_time);
         top_approach("TOP APPROACH PICK", obj_to_pick);
+        completed_stages_ ++ ;
         rclcpp::sleep_for(sleep_time);
         gripper_open();
+        completed_stages_ ++ ;
         rclcpp::sleep_for(sleep_time);
         top_retreat("TOP RETREAT");
+        completed_stages_ ++ ;
         rclcpp::sleep_for(sleep_time);
         gripper_close();
+        completed_stages_ ++ ;
         rclcpp::sleep_for(sleep_time);
 
         set_joint_goal("MOVE ARM HOME", rest_angles);
         task_executor();
+        completed_stages_ ++ ;
         break;
  /*       top_approach("TOP APPROACH RETURN", "target");
         task_executor();
@@ -287,6 +316,7 @@ void MTCPlanner::grab_from_top(std::string obj_to_pick, int start_stage, int end
 
 void MTCPlanner::grab_from_side(std::string obj_to_pick, int start_stage, int end_stage){
 
+    pickup_option_ = "UNDER_ARM" ;
     std::chrono::nanoseconds sleep_time = 3000ms ;
     rclcpp::sleep_for(sleep_time);
 
@@ -300,9 +330,11 @@ void MTCPlanner::grab_from_side(std::string obj_to_pick, int start_stage, int en
     case pick_underarm::UNDERARM_HOME:
         if(!arm_at_home){
             gripper_open();
+            completed_stages_ ++ ;
             rclcpp::sleep_for(sleep_time);
             set_joint_goal("MOVE ARM HOME", rest_angles);
             task_executor();
+            completed_stages_ ++ ;
             rclcpp::sleep_for(sleep_time);
 
             arm_at_home = true ;
@@ -316,6 +348,7 @@ void MTCPlanner::grab_from_side(std::string obj_to_pick, int start_stage, int en
         RCLCPP_INFO(LOGGER, "Inside UNDERARM_TURN ");  
         set_joint_goal("UNDERARM_POSE", underarm_turn_angles);
         task_executor();
+        completed_stages_ ++ ;
         rclcpp::sleep_for(sleep_time);
 
         // pick_underarm_enum_value = pick_underarm::UNDERARM_PICK ;
@@ -323,14 +356,16 @@ void MTCPlanner::grab_from_side(std::string obj_to_pick, int start_stage, int en
 
     case pick_underarm::UNDERARM_PICK:
         set_joint_goal("UNDERARM PRE PICK", underarm_pre_pick_angles);
-        task_executor();    
+        task_executor(); 
+        completed_stages_ ++ ;
         underarm_approach("UNDERARM APPROACH PICK", obj_to_pick);
-        // Close the gripper here
-	      // task_executor();
+        completed_stages_ ++ ;
 	      rclcpp::sleep_for(sleep_time);
 	      gripper_close();
+        completed_stages_ ++ ;
 	      rclcpp::sleep_for(sleep_time);
         underarm_retreat("UNDERARM RETREAT");
+        completed_stages_ ++ ;
 	      rclcpp::sleep_for(sleep_time);
 
         // pick_underarm_enum_value = pick_underarm::UNDERARM_PLACE ;
@@ -339,22 +374,31 @@ void MTCPlanner::grab_from_side(std::string obj_to_pick, int start_stage, int en
     case pick_underarm::UNDERARM_PLACE:
         set_joint_goal("UNDERARM_PRE_PLACE", underarm_pre_place_angles);
         task_executor();
+        completed_stages_ ++ ;
         underarm_approach("UNDERARM_APPROACH_PLACE", "target");
+        completed_stages_ ++ ;
 	      rclcpp::sleep_for(sleep_time);
 	      gripper_open();        // Open the gripper here
+        completed_stages_ ++ ;
 	      rclcpp::sleep_for(sleep_time);
         underarm_retreat("UNDERARM RETREAT");
+        completed_stages_ ++ ;
 
 	      rclcpp::sleep_for(sleep_time);
 	      gripper_close();     
+        completed_stages_ ++ ;
 	      rclcpp::sleep_for(sleep_time);
 	      gripper_open();        // Open the gripper here
+        completed_stages_ ++ ;
 	      rclcpp::sleep_for(sleep_time);
-	underarm_approach("UNDERARM_APPROACH_PLACE", "target");
+	      underarm_approach("UNDERARM_APPROACH_PLACE", "target");
+        completed_stages_ ++ ;
 	      rclcpp::sleep_for(sleep_time);
 	      gripper_close();       // close the gripper here
+        completed_stages_ ++ ;
 	      rclcpp::sleep_for(sleep_time);
         underarm_retreat("UNDERARM RETREAT");
+        completed_stages_ ++ ;
 	      rclcpp::sleep_for(sleep_time);
 
         pick_underarm_enum_value = pick_underarm::UNDERARM_RETURNED ;
@@ -365,13 +409,17 @@ void MTCPlanner::grab_from_side(std::string obj_to_pick, int start_stage, int en
 
         set_joint_goal("UNDERARM PRE RETURN", underarm_base_rotation_for_return);
         task_executor();
+        completed_stages_ ++ ;
         set_joint_goal("UNDERARM PRE PICK", underarm_pre_pick_angles);
         task_executor();
-	set_joint_goal("UNDERARM PLACE", underarm_place);
-	task_executor();
+        completed_stages_ ++ ;
+        set_joint_goal("UNDERARM PLACE", underarm_place);
+        task_executor();
+        completed_stages_ ++ ;
         //underarm_approach("UNDERARM APPROACH RETURN", obj_to_pick);
 	      rclcpp::sleep_for(sleep_time);
-	      gripper_open();                // open the gripper here
+	      gripper_open();   
+        completed_stages_ ++ ;
         // underarm_retreat("UNDERARM RETREAT", obj_to_pick);
         // task_executor();         
         // // Move home after putting the sample back
@@ -939,6 +987,15 @@ geometry_msgs::msg::PoseStamped MTCPlanner::get_eef_pose(){
 
 }
 
+
+double MTCPlanner::get_completion_precentage(){
+  double percent = 0.0 ;
+
+  if(pickup_option_ == "OVER_ARM") { percent = completed_stages_/over_arm_stages_ ;}
+  if(pickup_option_ == "UNDER_ARM") { percent = completed_stages_/under_arm_stages_ ;}
+
+  return percent ;
+}
 
 void MTCPlanner::gripper_open(){
 

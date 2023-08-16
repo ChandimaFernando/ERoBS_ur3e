@@ -1,7 +1,7 @@
 ur_task_manager:
   ros__parameters:
-    num_objects: 4
-    object_names: ['sample1','sample2','target', 'table']
+    num_objects: 12
+    object_names: ['sample1','sample2','target', 'table', 'table_gluider', 'platform','holder_base','holder_shaft','holder_head','holder_2_base','holder_2_shaft','holder_2_head']
     objects:
       sample1:
         type: 'CYLINDER'
@@ -43,10 +43,81 @@ ur_task_manager:
         #w: 0.0 # pose, orientation 
         x: 0.0 # pose x
         y: 0.0 # pose y
-        z: -0.01 # pose z
-        euler_x: 0.0
-        euler_y: 0.0
-        euler_z: 0.0
+        z: -0.03 # pose z
+      table_gluider:
+        type: 'BOX'
+        w: 0.60 # width
+        d: 0.15 # depth
+        h: 0.02 # height
+        #w: 0.0 # pose, orientation 
+        x: 0.0 # pose x
+        y: 0.0 # pose y
+        z: -0.015 # pose z
+      platform:
+        type: 'BOX'
+        w: 0.30 # width
+        d: 0.10 # depth
+        h: 0.03 # height
+        #w: 0.0 # pose, orientation 
+        x: 0.0 # pose x
+        y: 0.45 # pose y
+        z: 0.40 # pose z 
+      holder_base:
+        type: 'BOX'
+        w: 0.06 # width
+        d: 0.06 # depth
+        h: 0.01 # height
+        #w: 0.0 # pose, orientation 
+        x: 0.0 # pose x
+        y: 0.45 # pose y
+        z: 0.42 # pose z 
+      holder_shaft:
+        type: 'BOX'
+        w: 0.02 # width
+        d: 0.01 # depth
+        h: 0.04 # height
+        #w: 0.0 # pose, orientation 
+        x: 0.0 # pose x
+        y: 0.45 # pose y
+        z: 0.445 # pose z 
+      holder_head:
+        type: 'BOX'
+        w: 0.08 # width
+        d: 0.01 # depth
+        h: 0.02 # height
+        #w: 0.0 # pose, orientation 
+        x: 0.0 # pose x
+        y: 0.45 # pose y
+        z: 0.475 # pose z 
+      holder_2_base:
+        type: 'BOX'
+        w: 0.06 # width
+        d: 0.06 # depth
+        h: 0.01 # height
+        #w: 0.0 # pose, orientation 
+        x: 0.0 # pose x
+        y: -0.45 # pose y
+        z: 0.005 # pose z 
+      holder_2_shaft:
+        type: 'BOX'
+        w: 0.02 # width
+        d: 0.01 # depth
+        h: 0.04 # height
+        #w: 0.0 # pose, orientation 
+        x: 0.0 # pose x
+        y: -0.45 # pose y
+        z: 0.03 # pose z 
+      holder_2_head:
+        type: 'BOX'
+        w: 0.08 # width
+        d: 0.01 # depth
+        h: 0.02 # height
+        #w: 0.0 # pose, orientation 
+        x: 0.0 # pose x
+        y: -0.45 # pose y
+        z: 0.06 # pose z 
+    over_arm_stages: 21.0
+    under_Arm_stages: 19.0
     ur3e:
       joint_names: ['shoulder_pan_joint' , 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
       # rest_angles: [-1.600699, -1.4477506, -1.7994345, -1.4871951, 1.595100] #[shoulder_pan_joint, shoulder_lift_joint, elbow_joint, wrist_1_joint, wrist_2_joint]

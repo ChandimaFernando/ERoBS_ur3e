@@ -1,10 +1,11 @@
-#ifndef UR_ACTION_CLIENT_HPP
-#define UR_ACTION_CLIENT_HPP
+#ifndef UR_ACTION_SERVER_HPP
+#define UR_ACTION_SERVER_HPP
 
 #include <chrono>
 #include <functional>
 #include <memory>
 #include <map>
+#include <unordered_map>
 #include <rclcpp/rclcpp.hpp>
 #include <vector>
 
@@ -23,6 +24,8 @@
 #include <tf2/convert.h>
 #include <tf2/impl/utils.h>
 
+static const rclcpp::Logger LOGGER_AS = rclcpp::get_logger("action_server");
+
 class URTaskManager
 {
 
@@ -40,7 +43,6 @@ class URTaskManager
 
 
   private:
-    static const rclcpp::Logger LOGGER; 
     rclcpp::Node::SharedPtr node_;
     
     moveit_visual_tools::MoveItVisualTools *moveit_visual_tools_ ;
@@ -63,6 +65,10 @@ class URTaskManager
 
     rclcpp_action::Server<PickPlaceAct>::SharedPtr action_server_;
 
+    std::unordered_map<std::string, int> pickup_options_ = {
+        {"OVER_ARM", 1},
+        {"UNDER_ARM", 2}   
+    };
 
     /// @brief  This function initializes all the necessory objects and variables. This is called from the constructor 
     void create_nodes();
