@@ -13,6 +13,10 @@
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit_visual_tools/moveit_visual_tools.h>
 
+#include <moveit/robot_model_loader/robot_model_loader.h>
+#include <moveit/robot_model/robot_model.h>
+#include <moveit/robot_state/robot_state.h>
+
 #include <moveit_task_constructor_msgs/action/execute_task_solution.hpp>
 #include <moveit/task_constructor/task.h>
 #include <moveit/task_constructor/solvers.h>
@@ -54,6 +58,10 @@ class MTCPlanner
         void create_env() ;
         double get_completion_precentage();
 
+
+        void set_joint_value_via_movegroup(std::vector<double> angel_list);
+        void pick_up(std::string obj_to_pick);
+
     private:
 
         rclcpp::Node::SharedPtr node_;
@@ -65,6 +73,10 @@ class MTCPlanner
         // rcl_interfaces::msg::SetParametersResult param_change_callback(const std::vector<rclcpp::Parameter> &parameters);
         /// @brief interface to manage the obstacle environment
         moveit::planning_interface::PlanningSceneInterface *planning_scene_interface;
+        const moveit::core::JointModelGroup *joint_model_group_ ;
+        moveit::core::RobotState *robot_state_ ;
+        std::vector<double> joint_values_;
+
 
         /// @brief Global variable to assign and pass each task
         moveit::task_constructor::Task task_;
@@ -87,8 +99,13 @@ class MTCPlanner
         /// @brief Places sample on position
         std::vector<double> underarm_place ;
 
-        int over_arm_stages_ ;
-        int under_arm_stages_ ;
+        std::vector<double> pre_approach_angles ;
+        std::vector<double>  pre_approach_stg_2_angles;
+
+
+
+        double over_arm_stages_ ;
+        double under_arm_stages_ ;
         int completed_stages_ ;
 
         /// @brief This maps the collision ojbect type to an integer to be used in switch statement.
@@ -117,6 +134,8 @@ class MTCPlanner
 
         // Delete the irrelevent onces later
         double finger_offset_x , finger_offset_y,  finger_offset_z ;
+        
+        double axis_tolarance_ ;
 
 
         /// @brief OVER_ARM or UNDER_ARM to denote which pickup was called
@@ -130,7 +149,13 @@ class MTCPlanner
             UNDERARM_HOME, UNDERARM_TURN, UNDERARM_PICK , UNDERARM_PLACE, UNDERARM_RETURNED
         };
 
+        enum class pick_up_enum{
+            REST, APPROACH, GRASP , RETREAT, REST_W_SAMPLE
+        };
+
+
         int pick_overarm_next_state = 0 ;
+        bool arm_at_rest = false ;
         bool arm_at_home = false ;
 
         const std::string  arm_group_name_ = "ur_arm";
@@ -150,6 +175,8 @@ class MTCPlanner
 
         void underarm_approach(std::string task_name, std::string obj_to_picks);
         void underarm_retreat(std::string task_name) ;
+
+        void approach_object(std::string task_name, std::string obj_to_pick);
 
         geometry_msgs::msg::PoseStamped get_eef_pose();
 

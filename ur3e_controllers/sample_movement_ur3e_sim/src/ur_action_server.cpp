@@ -25,7 +25,9 @@ URTaskManager::URTaskManager(const rclcpp::NodeOptions& options)
   // Add make shared 
   mtc_planner_node_ = new MTCPlanner(node_);
 
+  mtc_planner_node_->initialize();
   mtc_planner_node_->create_env();
+  mtc_planner_node_->pick_up("holder_2_shaft");
 
 }  
 

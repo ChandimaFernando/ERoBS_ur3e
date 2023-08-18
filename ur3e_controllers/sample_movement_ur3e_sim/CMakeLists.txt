@@ -27,7 +27,7 @@ include_directories(include)
 # add_executable(sample_movement_ur3e_sim src/ur_task_manager_sim.cpp src/mtc_planner.cpp)
 add_executable(sample_movement_ur3e_sim src/ur_action_server.cpp src/mtc_planner.cpp)
 add_executable(sample_place_publisher src/sample_movement_ur3e_sim.cpp)
-add_executable(task_server src/task_server.cpp)
+# add_executable(task_server src/task_server.cpp)
 
 ament_target_dependencies(
   sample_movement_ur3e_sim 
@@ -48,13 +48,13 @@ ament_target_dependencies(
   custom_msgs
 )
 
-ament_target_dependencies(
-  task_server
-  rclcpp
-  rclcpp_action
-  rclcpp_components
-  custom_msgs
-)
+# ament_target_dependencies(
+#   task_server
+#   rclcpp
+#   rclcpp_action
+#   rclcpp_components
+#   custom_msgs
+# )
 
 
 target_include_directories(sample_movement_ur3e_sim PUBLIC
@@ -74,13 +74,13 @@ target_compile_features(sample_place_publisher PUBLIC c_std_99 cxx_std_17)  # Re
 install(TARGETS sample_place_publisher
   DESTINATION lib/${PROJECT_NAME})
 
-  target_include_directories(task_server PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-target_compile_features(task_server PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+#   target_include_directories(task_server PUBLIC
+#   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+#   $<INSTALL_INTERFACE:include>)
+# target_compile_features(task_server PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 
-install(TARGETS task_server
-  DESTINATION lib/${PROJECT_NAME})
+# install(TARGETS task_server
+  # DESTINATION lib/${PROJECT_NAME})
 
 
 install(

@@ -31,7 +31,7 @@ ur_task_manager:
         #w: 0.0 # pose, orientation 
         x: -0.15 # -0.15->ovehead -0.16->underarm    
         y: 0.31 # 0.34->overhead 0.33->underarm     
-        z: 0.11 # 0.04->overhead 0.11->underarm
+        z: 10.11 # 0.04->overhead 0.11->underarm
         euler_x: 0.0
         euler_y: 0.0
         euler_z: 1.0 # This is in degrees
@@ -96,7 +96,7 @@ ur_task_manager:
         h: 0.01 # height
         #w: 0.0 # pose, orientation 
         x: 0.0 # pose x
-        y: -0.45 # pose y
+        y: -0.55 # pose y
         z: 0.005 # pose z 
       holder_2_shaft:
         type: 'BOX'
@@ -105,7 +105,7 @@ ur_task_manager:
         h: 0.04 # height
         #w: 0.0 # pose, orientation 
         x: 0.0 # pose x
-        y: -0.45 # pose y
+        y: -0.55 # pose y
         z: 0.03 # pose z 
       holder_2_head:
         type: 'BOX'
@@ -114,14 +114,18 @@ ur_task_manager:
         h: 0.02 # height
         #w: 0.0 # pose, orientation 
         x: 0.0 # pose x
-        y: -0.45 # pose y
+        y: -0.55 # pose y
         z: 0.06 # pose z 
     over_arm_stages: 21.0
-    under_Arm_stages: 19.0
+    under_arm_stages: 19.0
     ur3e:
       joint_names: ['shoulder_pan_joint' , 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
-      # rest_angles: [-1.600699, -1.4477506, -1.7994345, -1.4871951, 1.595100] #[shoulder_pan_joint, shoulder_lift_joint, elbow_joint, wrist_1_joint, wrist_2_joint]
-      rest_angles: [-3.13129, -1.61251, -1.55614, -1.52612, 1.54078, 0.07278] #For real robot
+      rest_angles: [0.0, -1.5708, 0.0, -1.5708, 1.5708, 0.0] #For real robot
+      # Pick_up task
+      # pre_approach: [0.0, -2.73458187, -2.04204 , 0.06492625 , 0.0, 1.54078] # These are for sideway arm
+      pre_approach: [0.0, -2.32129, -2.3911 , -1.54078 , -1.54078, 3.14159] # These are for under arm
+      pre_approach_stg_2: [-4.04916, -2.32129, -2.3911 , -1.54078 , -0.97145026, 3.14159] # These are for under arm
+
       ##### Over arm pick up #######
       top_pre_pick: [-3.9793507, -1.61251, -1.55614, -1.52612, 1.54078, 0.61959188 ] #overhead
       top_pre_place: [-0.8419468, -1.61251, -1.55614, -1.52612, 1.54078, 1.3796827]
@@ -140,5 +144,5 @@ ur_task_manager:
       finger_offset_y: 0.0
       finger_offset_z: 0.01
       axis_tolarance: 0.1
-      simulation: false
+      simulation: true
 
