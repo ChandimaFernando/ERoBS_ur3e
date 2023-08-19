@@ -61,6 +61,13 @@ class MTCPlanner
 
         void set_joint_value_via_movegroup(std::vector<double> angel_list);
         void pick_up(std::string obj_to_pick);
+        void place(std::string obj_to_pick);
+        void return_pickup(std::string obj_to_pick);
+        void return_place(std::string obj_to_pick);
+
+
+        void move_out_of_rest();
+
 
     private:
 
@@ -73,9 +80,9 @@ class MTCPlanner
         // rcl_interfaces::msg::SetParametersResult param_change_callback(const std::vector<rclcpp::Parameter> &parameters);
         /// @brief interface to manage the obstacle environment
         moveit::planning_interface::PlanningSceneInterface *planning_scene_interface;
-        const moveit::core::JointModelGroup *joint_model_group_ ;
-        moveit::core::RobotState *robot_state_ ;
-        std::vector<double> joint_values_;
+        // const moveit::core::JointModelGroup *joint_model_group_ ;
+        // moveit::core::RobotState *robot_state_ ;
+        // std::vector<double> joint_values_;
 
 
         /// @brief Global variable to assign and pass each task
@@ -100,9 +107,10 @@ class MTCPlanner
         std::vector<double> underarm_place ;
 
         std::vector<double> pre_approach_angles ;
-        std::vector<double>  pre_approach_stg_2_angles;
-
-
+        std::vector<double> pre_approach_stg_2_angles;
+        std::vector<double> pre_dropoff_approach_angles ;
+        std::vector<double> pre_return_approach_angles ;
+        std::vector<double> out_of_jail_angles ;
 
         double over_arm_stages_ ;
         double under_arm_stages_ ;
@@ -137,6 +145,9 @@ class MTCPlanner
         
         double axis_tolarance_ ;
 
+        double approach_distance_x , approach_distance_y , approach_distance_z ;
+
+        double vertical_movement ; 
 
         /// @brief OVER_ARM or UNDER_ARM to denote which pickup was called
         std::string pickup_option_ = "" ;
@@ -150,9 +161,20 @@ class MTCPlanner
         };
 
         enum class pick_up_enum{
-            REST, APPROACH, GRASP , RETREAT, REST_W_SAMPLE
+            REST, APPROACH, GRASP , RETREAT
         };
 
+        enum class place_enum{
+            APPROACH, GRASP , RETREAT, REST 
+        };
+
+        enum class return_pick_up_enum{
+            APPROACH, GRASP , RETREAT
+        };
+
+        enum class return_place_enum{
+            APPROACH, GRASP , RETREAT, REST
+        };
 
         int pick_overarm_next_state = 0 ;
         bool arm_at_rest = false ;
@@ -177,7 +199,9 @@ class MTCPlanner
         void underarm_retreat(std::string task_name) ;
 
         void approach_object(std::string task_name, std::string obj_to_pick);
+        void retreat_object(std::string task_name, bool with_sample_attached);
 
+        void move_vertically(std::string task_name, std::string target);
         geometry_msgs::msg::PoseStamped get_eef_pose();
 
 
