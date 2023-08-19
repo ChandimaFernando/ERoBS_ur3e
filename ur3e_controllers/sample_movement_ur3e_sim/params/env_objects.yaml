@@ -1,40 +1,8 @@
 ur_task_manager:
   ros__parameters:
-    num_objects: 12
-    object_names: ['sample1','sample2','target', 'table', 'table_gluider', 'platform','holder_base','holder_shaft','holder_head','holder_2_base','holder_2_shaft','holder_2_head']
+    num_objects: 9
+    object_names: ['table', 'table_gluider', 'inbeam_platform','holder_base_inbeam','holder_shaft_inbeam','holder_head_inbeam','holder_base_storage','holder_shaft_storage','holder_head_storage']
     objects:
-      sample1:
-        type: 'CYLINDER'
-        h: 0.1 # height
-        r: 0.02 # radius
-        x: 10.16 #0.19 ->overhead 0.16->underarm
-        y: -0.382 #-0.43 ->overhead -0.38 -> underarm
-        z: 0.04 #0.017->overhead #0.04 ->underarm
-        euler_x: 0.0
-        euler_y: 0.0
-        euler_z: 0.0        
-      sample2:
-        type: 'CYLINDER'
-        h: 0.1 # height
-        r: 0.02 # radius
-        x: 0.21 # correct: 0.18 
-        y: -0.50 # correct: -0.50 
-        z: 0.04 
-        euler_x: 0.0
-        euler_y: 0.0
-        euler_z: 0.0        
-      target:
-        type: 'BOX'
-        w: 0.1 # width
-        d: 0.1 # depth
-        h: 0.01 # height
-        #w: 0.0 # pose, orientation 
-        x: -0.15 # -0.15->ovehead -0.16->underarm    
-        y: 0.31 # 0.34->overhead 0.33->underarm     
-        z: 10.11 # 0.04->overhead 0.11->underarm
-        euler_x: 0.0
-        euler_y: 0.0
-        euler_z: 1.0 # This is in degrees
       table:
         type: 'BOX'
         w: 2.0 # width
@@ -53,43 +21,43 @@ ur_task_manager:
         x: 0.0 # pose x
         y: 0.0 # pose y
         z: -0.015 # pose z
-      platform:
+      inbeam_platform:
         type: 'BOX'
         w: 0.30 # width
         d: 0.10 # depth
         h: 0.03 # height
         #w: 0.0 # pose, orientation 
         x: 0.0 # pose x
-        y: 0.45 # pose y
+        y: 0.50 # pose y
         z: 0.40 # pose z 
-      holder_base:
+      holder_base_inbeam:
         type: 'BOX'
         w: 0.06 # width
         d: 0.06 # depth
         h: 0.01 # height
         #w: 0.0 # pose, orientation 
         x: 0.0 # pose x
-        y: 0.45 # pose y
+        y: 0.50 # pose y
         z: 0.42 # pose z 
-      holder_shaft:
+      holder_shaft_inbeam:  #holder_shaft_inbeam
         type: 'BOX'
         w: 0.02 # width
         d: 0.01 # depth
         h: 0.04 # height
         #w: 0.0 # pose, orientation 
         x: 0.0 # pose x
-        y: 0.45 # pose y
+        y: 0.50 # pose y
         z: 0.445 # pose z 
-      holder_head:
+      holder_head_inbeam:
         type: 'BOX'
         w: 0.08 # width
         d: 0.01 # depth
         h: 0.02 # height
         #w: 0.0 # pose, orientation 
         x: 0.0 # pose x
-        y: 0.45 # pose y
+        y: 0.50 # pose y
         z: 0.475 # pose z 
-      holder_2_base:
+      holder_base_storage:
         type: 'BOX'
         w: 0.06 # width
         d: 0.06 # depth
@@ -98,7 +66,7 @@ ur_task_manager:
         x: 0.0 # pose x
         y: -0.55 # pose y
         z: 0.005 # pose z 
-      holder_2_shaft:
+      holder_shaft_storage: #holder_shaft_torage
         type: 'BOX'
         w: 0.02 # width
         d: 0.01 # depth
@@ -107,7 +75,7 @@ ur_task_manager:
         x: 0.0 # pose x
         y: -0.55 # pose y
         z: 0.03 # pose z 
-      holder_2_head:
+      holder_head_storage:
         type: 'BOX'
         w: 0.08 # width
         d: 0.01 # depth
@@ -120,12 +88,21 @@ ur_task_manager:
     under_arm_stages: 19.0
     ur3e:
       joint_names: ['shoulder_pan_joint' , 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
-      rest_angles: [0.0, -1.5708, 0.0, -1.5708, 1.5708, 0.0] #For real robot
+      rest_angles: [0.0, -1.5708, 0.0, -1.5708, 0.0, 0.0] #For real robot
       # Pick_up task
       # pre_approach: [0.0, -2.73458187, -2.04204 , 0.06492625 , 0.0, 1.54078] # These are for sideway arm
-      pre_approach: [0.0, -2.32129, -2.3911 , -1.54078 , -1.54078, 3.14159] # These are for under arm
-      pre_approach_stg_2: [-4.04916, -2.32129, -2.3911 , -1.54078 , -0.97145026, 3.14159] # These are for under arm
+      pre_approach: [0.0, -2.32129, -2.3911 , -1.54078 , -1.54078, 3.14159] 
+      pre_approach_stg_2: [-4.05474892, -2.32129, -2.3911 , -1.54078 , -0.9541715, 3.14159]
+      pre_dropoff_approach: [-0.78330377, -1.3639748, -1.0747738 , -3.81057736 , -0.81995568, 3.135484]
 
+
+      pre_return_approach: [-4.12526022, -1.8919369, -0.1740093 , -4.18791754, -1.0094984, 3.14159]
+      out_of_jail: [0.0, -2.32129, -2.3911 , -1.54078 , -1.54078, 3.14159] 
+
+      # pre_return_approach: [-4.12526022, -1.3639748, -1.0747738 , -3.81057736 , -0.81995568, 3.135484]
+
+      retreate_distance_z: 0.15
+      vertical_movement: 0.4
       ##### Over arm pick up #######
       top_pre_pick: [-3.9793507, -1.61251, -1.55614, -1.52612, 1.54078, 0.61959188 ] #overhead
       top_pre_place: [-0.8419468, -1.61251, -1.55614, -1.52612, 1.54078, 1.3796827]
@@ -141,7 +118,7 @@ ur_task_manager:
       base_frame: 'base_link'
       eef_frame: 'flange'
       finger_offset_x: 0.0
-      finger_offset_y: 0.0
+      finger_offset_y: 0.01
       finger_offset_z: 0.01
       axis_tolarance: 0.1
       simulation: true

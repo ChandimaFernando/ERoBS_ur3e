@@ -7,26 +7,17 @@ MTCPlanner::MTCPlanner(const rclcpp::Node::SharedPtr& node)
 
 {
     // Assign the passed node
-    node_ = node ;
+    this->node_ = node ;
 
     // Create gripper client
-    this->client_ = node_->create_client<custom_msgs::srv::GripperCmd>("gripper_service");
+    this->client_ = this->node_->create_client<custom_msgs::srv::GripperCmd>("gripper_service");
 
     // Initialize tf buffer to get hand coordinates
-    tf_buffer_ = std::make_unique<tf2_ros::Buffer>(node_->get_clock());
+    tf_buffer_ = std::make_unique<tf2_ros::Buffer>(this->node_->get_clock());
     tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
 
-    this->move_group_interface_ = new MoveGroupInterface(node_, "ur_arm");
+    this->move_group_interface_ = new MoveGroupInterface(this->node_, "ur_arm");
     this->planning_scene_interface = new moveit::planning_interface::PlanningSceneInterface() ;
-
-    robot_model_loader::RobotModelLoader robot_model_loader(node_);
-    const moveit::core::RobotModelPtr& kinematic_model = robot_model_loader.getModel();
-
-  this->robot_state_ = new moveit::core::RobotState(kinematic_model);
-  
-  this->robot_state_->setToDefaultValues();
-  this->joint_model_group_ = kinematic_model->getJointModelGroup("ur_arm");
-
 
 }
 
@@ -64,7 +55,14 @@ void MTCPlanner::initialize()
 
     this->pre_approach_angles = node_->get_parameter("ur3e.pre_approach").as_double_array();
     this->pre_approach_stg_2_angles = node_->get_parameter("ur3e.pre_approach_stg_2").as_double_array();
+    this->approach_distance_z = node_->get_parameter("ur3e.retreate_distance_z").as_double();
+    this->vertical_movement = node_->get_parameter("ur3e.vertical_movement").as_double();
+    this->pre_dropoff_approach_angles = node_->get_parameter("ur3e.pre_dropoff_approach").as_double_array();
+    this->pre_return_approach_angles = node_->get_parameter("ur3e.pre_return_approach").as_double_array();
+    this->out_of_jail_angles = node_->get_parameter("ur3e.out_of_jail").as_double_array();
 
+    
+    
     // // Create objects in a recursion
     // for(int i = 0 ; i < num_objects ; i++){
   
@@ -186,12 +184,71 @@ void MTCPlanner::task_executor(){
 
 }
 
+void MTCPlanner::move_out_of_rest(){
 
+  RCLCPP_ERROR_STREAM(LOGGER, " INSIDE out of rest");
+
+  // robot_model_loader::RobotModelLoader robot_model_loader(this->node_);
+  // const moveit::core::RobotModelPtr& kinematic_model = robot_model_loader.getModel();
+
+  // auto robot_state_ = new moveit::core::RobotState(kinematic_model);
+
+  // robot_state_->setToDefaultValues();
+  // auto joint_model_group_ = kinematic_model->getJointModelGroup("ur_arm");
+  // RCLCPP_ERROR_STREAM(LOGGER, " REACHED 1");
+
+  std::vector<double> joint_values_{0.0, 0.0, 0.0, 0.0 , 0.0, 0.0};
+
+  // const std::vector<std::string>& joint_names_local_var = joint_model_group_->getVariableNames();
+  // robot_state_->copyJointGroupPositions(joint_model_group_, joint_values_);  
+
+  // // This is to differentiate the sequence of which joint to turn in underarm turn vs other regular joint movements
+  // RCLCPP_ERROR_STREAM(LOGGER, " REACHED 2");
+
+
+  joint_values_[2] = 0.785398 ;
+
+  // int num_joints = joint_names_local_var.size();
+
+  // // This is to differentiate the sequence of which joint to turn in underarm turn vs other regular joint movements
+
+  //   for (int i = 0; i < num_joints ; i++){
+  //       {
+  //           RCLCPP_INFO(LOGGER, "joint: %s current is %f .", joint_names_local_var[i].c_str(), joint_values_[i]);
+  //       }
+  //   }
+  // robot_state_->setJointGroupPositions(joint_model_group_, joint_values_);
+
+  // this->move_group_interface_->setJointValueTarget(joint_values_);
+
+  // moveit::planning_interface::MoveGroupInterface::Plan traj_plan;
+
+  // bool success = (this->move_group_interface_->plan(traj_plan) == moveit::core::MoveItErrorCode::SUCCESS);
+  // RCLCPP_INFO(LOGGER, "Generating plan is a %s", success ? "" : "FAILED");
+
+  // this->move_group_interface_->execute(traj_plan);
+  RCLCPP_ERROR_STREAM(LOGGER, " REACHED 2");
+
+  this->set_joint_goal("OUT",this->rest_angles);
+  RCLCPP_ERROR_STREAM(LOGGER, " REACHED 3");
+
+}
 
 void MTCPlanner::set_joint_value_via_movegroup(std::vector<double> angle_list){
 
-  const std::vector<std::string>& joint_names_local_var = this->joint_model_group_->getVariableNames();
-  this->robot_state_->copyJointGroupPositions(this->joint_model_group_, this->joint_values_);  
+
+  robot_model_loader::RobotModelLoader robot_model_loader(this->node_);
+  const moveit::core::RobotModelPtr& kinematic_model = robot_model_loader.getModel();
+
+  auto robot_state_ = new moveit::core::RobotState(kinematic_model);
+
+  robot_state_->setToDefaultValues();
+  auto joint_model_group_ = kinematic_model->getJointModelGroup("ur_arm");
+
+  std::vector<double> joint_values_;
+
+  const std::vector<std::string>& joint_names_local_var = joint_model_group_->getVariableNames();
+  robot_state_->copyJointGroupPositions(joint_model_group_, joint_values_);  
 
   int num_joints = this->joint_names.size();
 
@@ -199,15 +256,15 @@ void MTCPlanner::set_joint_value_via_movegroup(std::vector<double> angle_list){
 
     for (int i = 0; i < num_joints ; i++){
         {
-            RCLCPP_INFO(LOGGER, "joint: %s current is %f and new is %f .", this->joint_names[0].c_str(), this->joint_values_[i] , angle_list[i]);
-            this->joint_values_[i] = angle_list[i];
+            RCLCPP_INFO(LOGGER, "joint: %s current is %f and new is %f .", this->joint_names[0].c_str(), joint_values_[i] , angle_list[i]);
+            joint_values_[i] = angle_list[i];
         }
 
     }
 
-  this->robot_state_->setJointGroupPositions(this->joint_model_group_, this->joint_values_);
+  robot_state_->setJointGroupPositions(joint_model_group_, joint_values_);
 
-  this->move_group_interface_->setJointValueTarget(this->joint_values_);
+  this->move_group_interface_->setJointValueTarget(joint_values_);
 
   moveit::planning_interface::MoveGroupInterface::Plan traj_plan;
 
@@ -245,9 +302,12 @@ void MTCPlanner::approach_object(std::string task_name, std::string obj_to_pick)
     intrm_pose.orientation = eef_pose.pose.orientation ;
     waypoints.push_back(intrm_pose);
 
-    // Add the end point
-    intrm_pose.position.z = obj_z ;
-    waypoints.push_back(intrm_pose);
+    double z_incs = (obj_z - eef_pose.pose.position.z -this->finger_offset_y)/5 ;
+
+    for (int i = 1 ; i <= 5 ; i++){
+      intrm_pose.position.z = eef_pose.pose.position.z + z_incs*i;
+      waypoints.push_back(intrm_pose);
+    }
 
     // define arm constraint and make it global  
     moveit_msgs::msg::OrientationConstraint oc;
@@ -277,6 +337,9 @@ void MTCPlanner::approach_object(std::string task_name, std::string obj_to_pick)
     waypoints.clear();
 
     // Next we add the x and y movement 
+    this->approach_distance_y = obj_y - eef_pose.pose.position.y; 
+    this->approach_distance_x = obj_x - eef_pose.pose.position.x; 
+
     double x_incs = (obj_x - eef_pose.pose.position.x)/5 ; 
     double y_incs = (obj_y - eef_pose.pose.position.y)/5 ; 
 
@@ -298,17 +361,117 @@ void MTCPlanner::approach_object(std::string task_name, std::string obj_to_pick)
       waypoints.push_back(intrm_pose);
 
     }
-
     this->move_group_interface_->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
     this->move_group_interface_->execute(trajectory);
+}
+
+void MTCPlanner::retreat_object(std::string task_name, bool with_sample_attached){
 
 
-    // RCLCPP_INFO(LOGGER, "arm_pose.pose.position.x : %f ", arm_pose.pose.position.x );  
-    // RCLCPP_INFO(LOGGER, "arm_pose.pose.position.y : %f ", arm_pose.pose.position.y );  
-    // RCLCPP_INFO(LOGGER, "arm_pose.pose.position.z : %f ", arm_pose.pose.position.z );  
+  geometry_msgs::msg::PoseStamped eef_pose = this->get_eef_pose();
+
+  std::vector<geometry_msgs::msg::Pose> waypoints;
+  geometry_msgs::msg::Pose intrm_pose ;
+
+    // define arm constraint and make it global  
+    moveit_msgs::msg::OrientationConstraint oc;
+    oc.link_name = "wrist_3_link" ; //"flange";
+    oc.header.frame_id = "base_link";
+    oc.weight = 1.0;
+
+    oc.absolute_x_axis_tolerance = this->axis_tolarance_ ;
+    oc.absolute_y_axis_tolerance = this->axis_tolarance_ ;
+
+    oc.orientation.w = eef_pose.pose.orientation.w ;
+    oc.orientation.x = eef_pose.pose.orientation.x ;
+    oc.orientation.y = eef_pose.pose.orientation.y ;
+    oc.orientation.z = eef_pose.pose.orientation.z;
+
+   // Execute the cartesian trajectory to adjust z first
+    moveit_msgs::msg::RobotTrajectory trajectory;
+    const double jump_threshold = 0.0;
+    const double eef_step = 0.01;
+
+  moveit_msgs::msg::Constraints test_constraints;
+  test_constraints.orientation_constraints.push_back(oc);
+  this->move_group_interface_->setPathConstraints(test_constraints);
+
+  // Add the starting point
+  intrm_pose.position = eef_pose.pose.position ;
+  intrm_pose.orientation = eef_pose.pose.orientation ;
+  waypoints.push_back(intrm_pose);
+
+    double x_incs = (this->approach_distance_x*-1)/5 ; 
+    double y_incs = (this->approach_distance_y*-1)/5 ; 
+    double z_incs = approach_distance_z/5 ;
+
+    RCLCPP_INFO(LOGGER, "approach_distance_z: %f ", approach_distance_z); 
+
+ 
+    for (int i = 1 ; i <= 5 ; i++){
+      intrm_pose.position.x = eef_pose.pose.position.x + x_incs*i;
+      intrm_pose.position.y = eef_pose.pose.position.y + y_incs*i;
+      // Do not move vertically in positive z if the sample holder is attached
+      if (with_sample_attached){intrm_pose.position.z = eef_pose.pose.position.z + z_incs*i; }
+
+      waypoints.push_back(intrm_pose);
+
+    }
+    this->move_group_interface_->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
+    this->move_group_interface_->execute(trajectory); 
 
 }
 
+
+void MTCPlanner::move_vertically(std::string task_name, std::string target)
+{
+  double tgt_z = node_->get_parameter("objects." + target + ".z").as_double() ; //+ hand_offset*cos(obj_yaw);
+
+  geometry_msgs::msg::PoseStamped eef_pose = this->get_eef_pose();
+
+  std::vector<geometry_msgs::msg::Pose> waypoints;
+  geometry_msgs::msg::Pose intrm_pose ;
+
+  // define arm constraint and make it global  
+  moveit_msgs::msg::OrientationConstraint oc;
+  oc.link_name = "wrist_3_link" ; //"flange";
+  oc.header.frame_id = "base_link";
+  oc.weight = 1.0;
+
+  oc.absolute_x_axis_tolerance = this->axis_tolarance_ ;
+  oc.absolute_y_axis_tolerance = this->axis_tolarance_ ;
+
+  oc.orientation.w = eef_pose.pose.orientation.w ;
+  oc.orientation.x = eef_pose.pose.orientation.x ;
+  oc.orientation.y = eef_pose.pose.orientation.y ;
+  oc.orientation.z = eef_pose.pose.orientation.z;
+
+  // Execute the cartesian trajectory to adjust z first
+  moveit_msgs::msg::RobotTrajectory trajectory;
+  const double jump_threshold = 0.0;
+  const double eef_step = 0.01;
+
+  moveit_msgs::msg::Constraints test_constraints;
+  test_constraints.orientation_constraints.push_back(oc);
+  this->move_group_interface_->setPathConstraints(test_constraints);
+
+  intrm_pose.position = eef_pose.pose.position ;
+  intrm_pose.orientation = eef_pose.pose.orientation ;
+  waypoints.push_back(intrm_pose);
+
+  double z_incs = (tgt_z - eef_pose.pose.position.z)/5 ; 
+
+  RCLCPP_INFO(LOGGER, "tgt_z - eef_pose.pose.position.z %f ", tgt_z - eef_pose.pose.position.z); 
+ 
+    for (int i = 1 ; i <= 5 ; i++){
+      intrm_pose.position.z = eef_pose.pose.position.z + z_incs*i;
+      waypoints.push_back(intrm_pose);
+
+    }
+    this->move_group_interface_->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
+    this->move_group_interface_->execute(trajectory); 
+
+}
 
 void MTCPlanner::pick_up(std::string obj_to_pick){
 
@@ -327,10 +490,15 @@ void MTCPlanner::pick_up(std::string obj_to_pick){
       case pick_up_enum::REST:
         if(!arm_at_rest){
           RCLCPP_INFO(LOGGER, "Inside pick_up_enum::REST "); 
-          gripper_open();
+          this->gripper_open();
           completed_stages_++ ;
           rclcpp::sleep_for(sleep_time);
-          // set_joint_value_via_movegroup(this->rest_angles);
+          this->set_joint_goal("MOVE ARM TO REST", this->rest_angles);
+          this->task_executor();
+          // set_joint_goal("MOVE ARM HOME", this->rest_angles);
+          // task_executor();
+          completed_stages_++ ;
+          rclcpp::sleep_for(sleep_time);
           arm_at_rest = true ;
         }
         
@@ -338,16 +506,11 @@ void MTCPlanner::pick_up(std::string obj_to_pick){
         break;
 
       case pick_up_enum::APPROACH:
-        set_joint_goal("MOVE ARM TO REST", this->rest_angles);
-        task_executor();
-        // set_joint_goal("MOVE ARM HOME", this->rest_angles);
-        // task_executor();
+        this->set_joint_value_via_movegroup(this->pre_approach_angles);
+        rclcpp::sleep_for(sleep_time);
         completed_stages_++ ;
-        rclcpp::sleep_for(sleep_time);
-        set_joint_value_via_movegroup(this->pre_approach_angles);
-        rclcpp::sleep_for(sleep_time);
-        set_joint_goal("MOVE ARM PRE APPROACH 2", this->pre_approach_stg_2_angles);
-        task_executor();
+        this->set_joint_goal("MOVE ARM PRE APPROACH 2", this->pre_approach_stg_2_angles);
+        this->task_executor();
         // set_joint_goal("MOVE ARM PRE APPROACH", this->pre_approach_angles);
         // task_executor();
         completed_stages_++ ;
@@ -356,11 +519,22 @@ void MTCPlanner::pick_up(std::string obj_to_pick){
         break ;
 
       case pick_up_enum::GRASP:
-        approach_object("APPROACH SAMPLE", obj_to_pick);
-
+        this->approach_object("APPROACH SAMPLE", obj_to_pick);
+        completed_stages_++ ;        
+        rclcpp::sleep_for(sleep_time);
+        this->gripper_close();
+        completed_stages_++ ;
+        rclcpp::sleep_for(sleep_time);
         break ;
 
       case pick_up_enum::RETREAT:
+        RCLCPP_INFO(LOGGER, "stage: RETREAT");
+        this->retreat_object("RETREAT SAMPLE", true);
+        rclcpp::sleep_for(sleep_time);
+        this->move_vertically("LIFT UP ARM", "holder_shaft_inbeam");
+        rclcpp::sleep_for(sleep_time);
+        // this->set_joint_goal("PRE DROPOFF", this->pre_dropoff_approach_angles);
+        // rclcpp::sleep_for(sleep_time);
 
         break ;
 
@@ -374,6 +548,181 @@ void MTCPlanner::pick_up(std::string obj_to_pick){
 
 }
 
+void MTCPlanner::place(std::string obj_to_pick){
+
+  std::chrono::nanoseconds sleep_time = 3000ms ;
+  rclcpp::sleep_for(sleep_time);
+  this->completed_stages_ = 0 ;
+
+  for (int i = 0 ; i <= 3; i++)
+  {
+    // pick_overarm pick_overarm_enum_value = pick_overarm::OVERARM_PICK ;
+    place_enum place_up_enum_value = static_cast<place_enum>(i);
+
+    switch (place_up_enum_value)
+    {
+      case place_enum::APPROACH:
+        RCLCPP_INFO(LOGGER, "Inside place_enum::APPROACH "); 
+        this->set_joint_goal("PRE PLACE APPROACH", this->pre_dropoff_approach_angles);
+        completed_stages_++ ;
+        this->task_executor();
+        rclcpp::sleep_for(sleep_time);
+        // set_joint_value_via_movegroup(this->rest_angles);
+        arm_at_rest = true ;
+        
+        // pick_overarm_enum_value = pick_overarm::OVERARM_PICK;
+        break;
+
+      case place_enum::GRASP:
+        this->approach_object("APPROACH SAMPLE", obj_to_pick);
+        rclcpp::sleep_for(sleep_time);
+        this->gripper_open();
+        completed_stages_++ ;
+        rclcpp::sleep_for(sleep_time);
+
+        break ;
+
+      case place_enum::RETREAT:
+        this->retreat_object("RETREAT SAMPLE", false);
+        rclcpp::sleep_for(sleep_time);
+
+        break;
+
+      case place_enum::REST:
+        this->set_joint_goal("MOVE ARM TO REST", this->rest_angles);
+        this->task_executor();
+        completed_stages_++ ;
+        rclcpp::sleep_for(sleep_time);
+
+        break ;
+
+      default:
+        RCLCPP_INFO(LOGGER, "Inside defualt ");  
+        break;
+    };
+  }
+
+
+}
+
+void MTCPlanner::return_pickup(std::string obj_to_pick){
+
+  std::chrono::nanoseconds sleep_time = 3000ms ;
+  rclcpp::sleep_for(sleep_time);
+  this->completed_stages_ = 0 ;
+
+  for (int i = 0 ; i <= 2 ; i++)
+  {
+    // pick_overarm pick_overarm_enum_value = pick_overarm::OVERARM_PICK ;
+    return_pick_up_enum return_pick_up_enum_value = static_cast<return_pick_up_enum>(i);
+
+    switch (return_pick_up_enum_value)
+    {
+      case return_pick_up_enum::APPROACH:
+        RCLCPP_INFO(LOGGER, "Inside return_pick_up_enum::APPROACH "); 
+        this->set_joint_goal("OUT OF JAIL", this->out_of_jail_angles );
+        completed_stages_++ ;
+        this->task_executor();
+        rclcpp::sleep_for(sleep_time);
+
+        this->set_joint_goal("RETURN_PRE_PICKUP", this->pre_dropoff_approach_angles);
+        completed_stages_++ ;
+        this->task_executor();
+        rclcpp::sleep_for(sleep_time);
+        // set_joint_value_via_movegroup(this->rest_angles);
+        arm_at_rest = true ;
+        
+        // pick_overarm_enum_value = pick_overarm::OVERARM_PICK;
+        break;
+
+      case return_pick_up_enum::GRASP:
+        this->approach_object("APPROACH_RETURN_SAMPLE", obj_to_pick);
+        rclcpp::sleep_for(sleep_time);
+        this->gripper_close();
+        completed_stages_++ ;
+        rclcpp::sleep_for(sleep_time);
+
+        break ;
+
+      case return_pick_up_enum::RETREAT:
+        this->retreat_object("RETREAT SAMPLE", true);
+        rclcpp::sleep_for(sleep_time);
+
+        break;
+
+      default:
+        RCLCPP_INFO(LOGGER, "Inside defualt ");  
+        break;
+    };
+  }
+
+
+}
+
+
+void MTCPlanner::return_place(std::string obj_to_pick){
+
+  std::chrono::nanoseconds sleep_time = 3000ms ;
+  rclcpp::sleep_for(sleep_time);
+  this->completed_stages_ = 0 ;
+
+  for (int i = 0 ; i <= 3; i++)
+  {
+    // pick_overarm pick_overarm_enum_value = pick_overarm::OVERARM_PICK ;
+    return_place_enum return_place_enum_value = static_cast<return_place_enum>(i);
+
+    switch (return_place_enum_value)
+    {
+      case return_place_enum::APPROACH:
+        RCLCPP_INFO(LOGGER, "Inside return_pick_up_enum::APPROACH "); 
+
+        this->set_joint_goal("RETURN_PRE_PLACE_ADJUSTMENT", this->pre_dropoff_approach_angles);
+        completed_stages_++ ;
+        this->task_executor();
+        rclcpp::sleep_for(sleep_time);
+
+        this->set_joint_goal("RETURN_PRE_PLACE", this->pre_return_approach_angles);
+        completed_stages_++ ;
+        this->task_executor();
+        rclcpp::sleep_for(sleep_time);
+        this->move_vertically("LOWER THE ARM", obj_to_pick);
+        this->task_executor();
+        rclcpp::sleep_for(sleep_time);
+        
+        // pick_overarm_enum_value = pick_overarm::OVERARM_PICK;
+        break;
+
+      case return_place_enum::GRASP:
+        this->approach_object("APPROACH_RETURN_SAMPLE", obj_to_pick);
+        rclcpp::sleep_for(sleep_time);
+        this->gripper_open();
+        completed_stages_++ ;
+        rclcpp::sleep_for(sleep_time);
+
+        break ;
+
+      case return_place_enum::RETREAT:
+        this->retreat_object("RETREAT SAMPLE", true);
+        rclcpp::sleep_for(sleep_time);
+
+        break;
+
+      case return_place_enum::REST:
+        this->set_joint_goal("MOVE ARM TO REST", this->rest_angles);
+        this->task_executor();
+        completed_stages_++ ;
+        rclcpp::sleep_for(sleep_time);
+        this->arm_at_rest = true ;
+        break ;
+
+      default:
+        RCLCPP_INFO(LOGGER, "Inside defualt ");  
+        break;
+    };
+  }
+
+
+}
 
 
 
@@ -712,12 +1061,12 @@ void MTCPlanner::set_joint_goal(std::string task_name, std::vector<double> home_
     int num_joints = MTCPlanner::joint_names.size();
 
     // This is to differentiate the sequence of which joint to turn in underarm turn vs other regular joint movements
-    if(task_name == "UNDERARM_POSE"){
+    if(task_name == "RETURN_PRE_PICKUP"){
 
       for (int i = 0; i < num_joints ; i++){
           {
-              std::map<std::string, double> init_arm_pose{{joint_names[MTCPlanner::under_arm_joint_order[i]], home_angle_list[MTCPlanner::under_arm_joint_order[i]]}};
-              auto stage_pose = std::make_unique<moveit::task_constructor::stages::MoveTo>("move"+joint_names[MTCPlanner::under_arm_joint_order[i]], interpolation_planner);
+              std::map<std::string, double> init_arm_pose{{joint_names[i], home_angle_list[i]}};
+              auto stage_pose = std::make_unique<moveit::task_constructor::stages::MoveTo>("move"+joint_names[i], interpolation_planner);
               stage_pose->setGroup(arm_group_name_);
               stage_pose->setGoal(init_arm_pose);
               MTCPlanner::task_.add(std::move(stage_pose));
@@ -726,8 +1075,7 @@ void MTCPlanner::set_joint_goal(std::string task_name, std::vector<double> home_
       }
 
     }
-
-   else if((task_name == "UNDERARM_PRE_PLACE") || (task_name == "UNDERARM_PLACE")){
+   else if(task_name == "OUT_OF_REST"){
 	for (int i = 0; i < num_joints ; i++){
           {
               std::map<std::string, double> init_arm_pose{{joint_names[MTCPlanner::underarm_joint_order[i]], home_angle_list[MTCPlanner::under_arm_joint_order[i]]}};

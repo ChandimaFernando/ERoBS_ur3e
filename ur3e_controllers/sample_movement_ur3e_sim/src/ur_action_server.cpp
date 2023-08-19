@@ -27,7 +27,15 @@ URTaskManager::URTaskManager(const rclcpp::NodeOptions& options)
 
   mtc_planner_node_->initialize();
   mtc_planner_node_->create_env();
-  mtc_planner_node_->pick_up("holder_2_shaft");
+
+  mtc_planner_node_->pick_up("holder_shaft_storage");
+  mtc_planner_node_->place("holder_shaft_inbeam");
+  mtc_planner_node_->return_pickup("holder_shaft_inbeam");
+  mtc_planner_node_->return_pickup("holder_shaft_storage");
+
+// mtc_planner_node_->move_out_of_rest();
+  
+
 
 }  
 
