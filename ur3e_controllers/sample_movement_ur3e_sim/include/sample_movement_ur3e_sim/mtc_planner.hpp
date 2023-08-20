@@ -25,8 +25,6 @@
 #include "tf2_ros/buffer.h"
 #include "tf2_ros/transform_listener.h"
 
-#include "custom_msgs/srv/gripper_cmd.hpp"
-
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/convert.h>
 #include <tf2/impl/utils.h>

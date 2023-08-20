@@ -90,28 +90,14 @@ ur_task_manager:
       joint_names: ['shoulder_pan_joint' , 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
       rest_angles: [0.0, -1.5708, 0.0, -1.5708, 0.0, 0.0] #For real robot
       # Pick_up task
-      # pre_approach: [0.0, -2.73458187, -2.04204 , 0.06492625 , 0.0, 1.54078] # These are for sideway arm
       pre_approach: [0.0, -2.32129, -2.3911 , -1.54078 , -1.54078, 3.14159] 
       pre_approach_stg_2: [-4.05474892, -2.32129, -2.3911 , -1.54078 , -0.9541715, 3.14159]
       pre_dropoff_approach: [-0.78330377, -1.3639748, -1.0747738 , -3.81057736 , -0.81995568, 3.135484]
-
-
       pre_return_approach: [-4.12526022, -1.8919369, -0.1740093 , -4.18791754, -1.0094984, 3.14159]
       out_of_jail: [0.0, -2.32129, -2.3911 , -1.54078 , -1.54078, 3.14159] 
-
-      # pre_return_approach: [-4.12526022, -1.3639748, -1.0747738 , -3.81057736 , -0.81995568, 3.135484]
-
       retreate_distance_z: 0.15
       vertical_movement: 0.4
-      ##### Over arm pick up #######
-      top_pre_pick: [-3.9793507, -1.61251, -1.55614, -1.52612, 1.54078, 0.61959188 ] #overhead
-      top_pre_place: [-0.8419468, -1.61251, -1.55614, -1.52612, 1.54078, 1.3796827]
       ##### Under arm pick up #######
-      underarm_pre_place: [-6.21721186, -2.28446146, -1.76766947, -2.16926973, 0.64873888, 3.02814625]
-      underarm_base_rotation_for_return: [-2.58238916, -2.28447523, -1.76766947, -2.16926974, 0.64873888, 3.02814625]
-      underarm_pre_pick: [-3.178942, -1.72124371, -2.43386164, -1.7376498, -0.154287106, 2.83022592] # The order of the angles has to be changes if the current results in collisions
-      underarm_turn_angles: [-2.83319298, -2.05931398, -1.70431401, -2.57715317, -0.154287106, 3.16183847 ] # The order of the angles has to be changes if the current results in collisions
-      underarm_place: [-3.6199874, -2.33490147, -1.60395758, -2.54434098, -0.524296907, 3.29640336]
       under_arm_joint_order: [4, 2, 0, 1, 3, 5 ]
       underarm_joint_order: [0, 2, 3, 4, 1, 5]
       hand_offset: 0.145
