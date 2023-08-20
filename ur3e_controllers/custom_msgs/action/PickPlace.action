@@ -1,4 +1,4 @@
-string sample_name 
+string sample_name    #Hmm ... these should be storage and inbeam. TODO
 string target_name
 string task_name # 4 options are : PICK_UP, PLACE, RETURN_PICK_UP, RETURN_PLACE
 ---

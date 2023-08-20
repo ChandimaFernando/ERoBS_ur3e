@@ -28,7 +28,12 @@ def main(args=None):
 
     action_client = PickPlaceActionClient()
 
-    future = action_client.send_goal('holder_shaft_storage', 'holder_shaft_inbeam', "RETURN_PICK_UP")
+    # future = action_client.send_goal(storage name, inbeam name, task name)
+    # Check the 4 example calls below
+    future = action_client.send_goal('holder_shaft_storage', 'holder_shaft_inbeam', "PICK_UP")
+    # future = action_client.send_goal('holder_shaft_storage', 'holder_shaft_inbeam', "PLACE")
+    # future = action_client.send_goal('holder_shaft_inbeam', 'holder_shaft_storage', "RETURN_PICK_UP")
+    # future = action_client.send_goal('holder_shaft_inbeam', 'holder_shaft_storage', "RETURN_PLACE")
 
     rclpy.spin_until_future_complete(action_client, future)
 

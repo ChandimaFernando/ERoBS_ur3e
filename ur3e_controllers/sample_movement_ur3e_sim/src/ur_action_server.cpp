@@ -79,6 +79,7 @@ void URTaskManager::execute(const std::shared_ptr<GoalHandlePickPlaceAct> goal_h
   rclcpp::Rate loop_rate(2); // This controls how frequent the feedback should be sent
   const auto goal = goal_handle->get_goal();    
   
+  // Hmm .. these should be storage and inbeam. TODO
   std::string sample_location = goal->sample_name ;
   std::string target_location = goal->target_name ;
   std::string client_request_task = goal->task_name ;
