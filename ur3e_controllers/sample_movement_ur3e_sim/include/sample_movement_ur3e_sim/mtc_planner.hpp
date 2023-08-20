@@ -22,6 +22,9 @@
 #include <moveit/task_constructor/solvers.h>
 #include <moveit/task_constructor/stages.h>
 
+#include "custom_msgs/action/pick_place.hpp"
+#include "custom_msgs/srv/gripper_cmd.hpp"
+
 #include "tf2_ros/buffer.h"
 #include "tf2_ros/transform_listener.h"
 
