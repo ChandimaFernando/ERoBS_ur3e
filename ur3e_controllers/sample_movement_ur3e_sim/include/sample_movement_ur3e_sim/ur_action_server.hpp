@@ -9,20 +9,8 @@
 #include <rclcpp/rclcpp.hpp>
 #include <vector>
 
-#include <moveit/planning_scene/planning_scene.h>
-#include <moveit/move_group_interface/move_group_interface.h>
-#include <moveit/planning_scene_interface/planning_scene_interface.h>
-// #include <moveit/moveit_visual_tools/moveit_visual_tools.h>
-#include <moveit_visual_tools/moveit_visual_tools.h>
-
-#include <geometry_msgs/msg/pose.h>
 #include "sample_movement_ur3e_sim/mtc_planner.hpp"
-#include "custom_msgs/srv/task_cmd.hpp"
 #include "custom_msgs/action/pick_place.hpp"
-
-#include <tf2/LinearMath/Quaternion.h>
-#include <tf2/convert.h>
-#include <tf2/impl/utils.h>
 
 static const rclcpp::Logger LOGGER_AS = rclcpp::get_logger("action_server");
 
@@ -34,62 +22,42 @@ class URTaskManager
 
   public:
     URTaskManager(const rclcpp::NodeOptions& options);
-
     rclcpp::node_interfaces::NodeBaseInterface::SharedPtr getNodeBaseInterface();
-
-
-    // std::vector<moveit_msgs::msg::CollisionObject> collision_ojbects ;
-
-
 
   private:
     rclcpp::Node::SharedPtr node_;
     
-    moveit_visual_tools::MoveItVisualTools *moveit_visual_tools_ ;
     MTCPlanner *mtc_planner_node_ ;
 
-    const moveit::core::JointModelGroup *jmg_ ;
-
-    // Record pose of the enf effector
-    double eef_pose_x ;
-    double eef_pose_y ;
-    double eef_pose_z ;
-
-    std::shared_ptr<rclcpp::ParameterEventHandler> param_subscriber_;
-    /// @brief callback handle for the topic from sample location
-    std::shared_ptr<rclcpp::ParameterCallbackHandle> cb_handle_;
-    /// @brief Callback subscriber 
-    rclcpp::Subscription<geometry_msgs::msg::Pose>::SharedPtr subscription_;
-
-    rclcpp::Service<custom_msgs::srv::TaskCmd>::SharedPtr task_service_ ;
-
+    /// @brief Pointer to the action server
     rclcpp_action::Server<PickPlaceAct>::SharedPtr action_server_;
 
-    std::unordered_map<std::string, int> pickup_options_ = {
-        {"OVER_ARM", 1},
-        {"UNDER_ARM", 2}   
+    const std::string ACTION_NAME = "erbos_pdf_pick_place_action" ;
+
+    /// @brief Enum for task types
+    enum class Task {
+      PICK_UP, PLACE, RETURN_PICK_UP, RETURN_PLACE
     };
 
-    /// @brief  This function initializes all the necessory objects and variables. This is called from the constructor 
-    void create_nodes();
-    /// @brief  This draws the robot trajectory in RViz 
-    /// @param trajectory 
-    void draw_trajectory_tool_path(robot_trajectory::RobotTrajectoryPtr& trajectory); 
-    /// @brief This callback changes parameter stack and recreate the env
-    /// @param msg 
-    void sample_pose_change_cb(const geometry_msgs::msg::Pose::SharedPtr msg) ; 
+    std::unordered_map<std::string, Task> task_map = {
+        {"PICK_UP", Task::PICK_UP},
+        {"PLACE", Task::PLACE},
+        {"RETURN_PICK_UP", Task::RETURN_PICK_UP},
+        {"RETURN_PLACE", Task::RETURN_PLACE}
+    };
 
-    // void create_services();
-    void create_services(const std::shared_ptr<custom_msgs::srv::TaskCmd::Request> request, const std::shared_ptr<custom_msgs::srv::TaskCmd::Response> response);
+    // /// @brief  This draws the robot trajectory in RViz 
+    // /// @param trajectory 
+    // void draw_trajectory_tool_path(robot_trajectory::RobotTrajectoryPtr& trajectory); 
 
-    rclcpp::Client<custom_msgs::srv::GripperCmd>::SharedPtr client_;
+    // rclcpp::Client<custom_msgs::srv::GripperCmd>::SharedPtr client_;
 
+    // Action server related call backs
     rclcpp_action::GoalResponse handle_goal( const rclcpp_action::GoalUUID & uuid, std::shared_ptr<const PickPlaceAct::Goal> goal);
 
     rclcpp_action::CancelResponse handle_cancel( const std::shared_ptr<GoalHandlePickPlaceAct> goal_handle);
 
     void handle_accepted(const std::shared_ptr<GoalHandlePickPlaceAct> goal_handle);
-
     void execute(const std::shared_ptr<GoalHandlePickPlaceAct> goal_handle);
 
 };

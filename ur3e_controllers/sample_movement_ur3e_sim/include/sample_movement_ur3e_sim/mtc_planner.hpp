@@ -58,18 +58,16 @@ class MTCPlanner
         void create_env() ;
         double get_completion_precentage();
 
-
         void set_joint_value_via_movegroup(std::vector<double> angel_list);
-        void pick_up(std::string obj_to_pick);
-        void place(std::string obj_to_pick);
-        void return_pickup(std::string obj_to_pick);
-        void return_place(std::string obj_to_pick);
-
-
-        void move_out_of_rest();
+        void pick_up(std::string obj_to_pick, std::string target_location);
+        void place(std::string obj_to_pick, std::string target_location);
+        void return_pickup(std::string obj_to_pick, std::string target_location);
+        void return_place(std::string obj_to_pick, std::string target_location);
 
 
     private:
+
+        const std::string UR3E_HANDE_MOVE_GROUP = "ur_arm" ;
 
         rclcpp::Node::SharedPtr node_;
 
@@ -91,25 +89,11 @@ class MTCPlanner
         std::vector<std::string> joint_names ;
         /// @brief Home / rest location for the ur3e arm
         std::vector<double> rest_angles ;       
-        /// @brief Turn towards the samples for the ur3e arm
-        std::vector<double> top_pre_pick_angles ;
-        /// @brief Turn towards the place area for the ur3e arm
-        std::vector<double> top_pre_place_angles ;
-        /// @brief Underarm pose
-        std::vector<double> underarm_turn_angles ;
-        /// @brief Turn towards the samples for the ur3e arm
-        std::vector<double> underarm_pre_pick_angles ;
-        /// @brief Turn towards the place area for the ur3e arm
-        std::vector<double> underarm_pre_place_angles ;
-        /// @brief Rotates base for easier path planning
-        std::vector<double> underarm_base_rotation_for_return ;
-        /// @brief Places sample on position
-        std::vector<double> underarm_place ;
 
-        std::vector<double> pre_approach_angles ;
-        std::vector<double> pre_approach_stg_2_angles;
-        std::vector<double> pre_dropoff_approach_angles ;
-        std::vector<double> pre_return_approach_angles ;
+        std::vector<double> pre_approach_angles_stage_1 ;
+        std::vector<double> pre_approach_angles_stage_2;
+        std::vector<double> pre_place_approach_angles ;
+        std::vector<double> pre_return_place_approach_angles ;
         std::vector<double> out_of_jail_angles ;
 
         double over_arm_stages_ ;
@@ -119,15 +103,9 @@ class MTCPlanner
         /// @brief This maps the collision ojbect type to an integer to be used in switch statement.
         std::map<std::string, int> obj_type_map ;
 
-        std::vector<long int> under_arm_joint_order ;
-	    std::vector<long int> underarm_joint_order ;
         /// @brief Holds sample location read from the params file
         std::vector<geometry_msgs::msg::Pose> sample_locations ; //= geometry_msgs::msg::Pose();
         geometry_msgs::msg::Pose taregt_location = geometry_msgs::msg::Pose();
-
-        /// @brief Records the distance the eef traveled to grab a sample / place at the target
-        geometry_msgs::msg::PoseStamped arm_top_approach_dists ;
-        geometry_msgs::msg::PoseStamped under_arm_approach_dists ;
 
         /// @brief True if run on rviz simulator, false on real-robot. Set via param file.
         bool if_simulation_ ;
@@ -190,14 +168,6 @@ class MTCPlanner
         /// @param task_name name of the task
         /// @param home_angle_list list of angles from the param file
         void set_joint_goal(std::string task_name, std::vector<double> home_angle_list);
-        void move_arm_underarm();
-        void side_pre_pick();
-        void top_swipe();
-        void top_approach(std::string task_name, std::string obj_to_picks);
-        void top_retreat(std::string task_name) ;
-
-        void underarm_approach(std::string task_name, std::string obj_to_picks);
-        void underarm_retreat(std::string task_name) ;
 
         void approach_object(std::string task_name, std::string obj_to_pick);
         void retreat_object(std::string task_name, bool with_sample_attached);
@@ -205,7 +175,7 @@ class MTCPlanner
         void move_vertically(std::string task_name, std::string target);
         geometry_msgs::msg::PoseStamped get_eef_pose();
 
-
+        void pretty_logger(std::string text);
 };
 
 #endif

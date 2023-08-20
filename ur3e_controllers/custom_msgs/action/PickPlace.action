@@ -1,6 +1,6 @@
-string sample_name
+string sample_name 
 string target_name
-string pickup_options
+string task_name # 4 options are : PICK_UP, PLACE, RETURN_PICK_UP, RETURN_PLACE
 ---
 bool success
 ---
