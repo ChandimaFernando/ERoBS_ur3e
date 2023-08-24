@@ -71,6 +71,7 @@ class MTCPlanner
         const std::string UR3E_HANDE_MOVE_GROUP = "ur_arm" ;
 
         rclcpp::Node::SharedPtr node_;
+        rclcpp::Node::SharedPtr gripper_node_ ;
 
         moveit::planning_interface::MoveGroupInterface *move_group_interface_ ;
 

@@ -9,7 +9,10 @@ MTCPlanner::MTCPlanner(const rclcpp::Node::SharedPtr& node)
     this->node_ = node ;
 
     // Create gripper client
-    this->client_ = this->node_->create_client<custom_msgs::srv::GripperCmd>("gripper_service");
+    this->gripper_node_ = std::make_shared<rclcpp::Node>("gripper_node");
+    this->client_ = this->gripper_node_->create_client<custom_msgs::srv::GripperCmd>("gripper_service");
+
+    // this->client_ = this->node_->create_client<custom_msgs::srv::GripperCmd>("gripper_service");
 
     // Initialize tf buffer to get hand coordinates
     tf_buffer_ = std::make_unique<tf2_ros::Buffer>(this->node_->get_clock());
@@ -772,7 +775,7 @@ void MTCPlanner::gripper_open(){
       auto result = this->client_->async_send_request(request);
 
       // Wait for the result.
-      if (rclcpp::spin_until_future_complete(this->node_, result) ==
+      if (rclcpp::spin_until_future_complete(this->gripper_node_, result) ==
         rclcpp::FutureReturnCode::SUCCESS)
       {
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Results: %d", result.get()->status);
@@ -780,11 +783,13 @@ void MTCPlanner::gripper_open(){
         RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service");
       }
 
-        }
+      }
       catch(const std::exception& e)
       {
         std::cerr << e.what() << '\n';
       }
+
+      // this->client_->
 
   }
   else{
@@ -797,28 +802,37 @@ void MTCPlanner::gripper_close(){
 
   if(!this->if_simulation_){
 
-    auto request = std::make_shared<custom_msgs::srv::GripperCmd::Request>();
+    try
+      {
 
-    request->grip = 10 ;
-    request->cmd = 'C' ;
+        auto request = std::make_shared<custom_msgs::srv::GripperCmd::Request>();
 
-    while (!this->client_->wait_for_service(1s)) {
-      if (!rclcpp::ok()) {
-        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+        request->grip = 10 ;
+        request->cmd = 'C' ;
+
+        while (!this->client_->wait_for_service(1s)) {
+          if (!rclcpp::ok()) {
+            RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+          }
+          RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
+        }
+
+        auto result = this->client_->async_send_request(request);
+
+        // Wait for the result.
+        if (rclcpp::spin_until_future_complete(this->gripper_node_, result) ==
+          rclcpp::FutureReturnCode::SUCCESS)
+        {
+          RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Results: %d", result.get()->status);
+        } else {
+          RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service");
+        }
+
       }
-      RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
-    }
-
-    auto result = this->client_->async_send_request(request);
-
-    // Wait for the result.
-    if (rclcpp::spin_until_future_complete(this->node_, result) ==
-      rclcpp::FutureReturnCode::SUCCESS)
-    {
-      RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Results: %d", result.get()->status);
-    } else {
-      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service");
-    }
+      catch(const std::exception& e)
+      {
+        std::cerr << e.what() << '\n';
+      }
   }
   else{
       RCLCPP_INFO(rclcpp::get_logger("rclcpp"), " Gripper close called but the function is disabled on simulator");
@@ -845,7 +859,7 @@ void MTCPlanner::gripper_activate(){
     auto result = this->client_->async_send_request(request);
 
     // Wait for the result.
-    if (rclcpp::spin_until_future_complete(this->node_, result) ==
+    if (rclcpp::spin_until_future_complete(this->gripper_node_, result) ==
       rclcpp::FutureReturnCode::SUCCESS)
     {
       RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Results: %d", result.get()->status);

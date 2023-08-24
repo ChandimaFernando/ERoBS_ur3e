@@ -30,8 +30,8 @@ def main(args=None):
 
     # future = action_client.send_goal(storage name, inbeam name, task name)
     # Check the 4 example calls below
-    future = action_client.send_goal('holder_shaft_storage', 'holder_shaft_inbeam', "PICK_UP")
-    # future = action_client.send_goal('holder_shaft_storage', 'holder_shaft_inbeam', "PLACE")
+    # future = action_client.send_goal('holder_shaft_storage', 'holder_shaft_inbeam', "PICK_UP")
+    future = action_client.send_goal('holder_shaft_storage', 'holder_shaft_inbeam', "PLACE")
     # future = action_client.send_goal('holder_shaft_inbeam', 'holder_shaft_storage', "RETURN_PICK_UP")
     # future = action_client.send_goal('holder_shaft_inbeam', 'holder_shaft_storage', "RETURN_PLACE")
 
