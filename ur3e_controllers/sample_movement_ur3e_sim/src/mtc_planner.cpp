@@ -58,8 +58,8 @@ void MTCPlanner::initialize()
     this->vertical_movement = node_->get_parameter("ur3e.vertical_movement").as_double();
     this->pre_place_approach_angles = node_->get_parameter("ur3e.pre_dropoff_approach").as_double_array();
     this->pre_return_place_approach_angles = node_->get_parameter("ur3e.pre_return_approach").as_double_array();
+    this->pre_return_place_adjustment_angles = node_->get_parameter("ur3e.pre_return_place_adjustment").as_double_array();
     this->out_of_jail_angles = node_->get_parameter("ur3e.out_of_jail").as_double_array();
-
 
 }
 
@@ -124,9 +124,10 @@ void MTCPlanner::create_env()
 
   }
 
-    MTCPlanner::planning_scene_interface->applyCollisionObjects(all_objects);
+    this->planning_scene_interface->applyCollisionObjects(all_objects);
     all_objects.clear();
 }
+
 
 void MTCPlanner::task_executor(){
 
@@ -601,7 +602,10 @@ void MTCPlanner::return_place(std::string obj_to_pick, std::string target_locati
         rclcpp::sleep_for(sleep_time);
         this->move_vertically("LOWER THE ARM", target_location);
         rclcpp::sleep_for(sleep_time);
-        
+        this->set_joint_goal("ADJUST ARM AFTER LOWERING", this->pre_approach_angles_stage_2);
+        rclcpp::sleep_for(sleep_time);
+        this->task_executor();
+        completed_stages_++ ;        
         // pick_overarm_enum_value = pick_overarm::OVERARM_PICK;
         break;
 
@@ -749,7 +753,7 @@ double MTCPlanner::get_completion_precentage(){
 
 void MTCPlanner::gripper_open(){
 
-  if(!if_simulation_){
+  if(!this->if_simulation_){
 
     try
       {
@@ -758,17 +762,17 @@ void MTCPlanner::gripper_open(){
       request->grip = 10 ;
       request->cmd = 'O' ;
     
-      while (!MTCPlanner::client_->wait_for_service(1s)) {
+      while (!this->client_->wait_for_service(1s)) {
         if (!rclcpp::ok()) {
           RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
         }
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
       }
 
-      auto result = MTCPlanner::client_->async_send_request(request);
+      auto result = this->client_->async_send_request(request);
 
       // Wait for the result.
-      if (rclcpp::spin_until_future_complete(node_, result) ==
+      if (rclcpp::spin_until_future_complete(this->node_, result) ==
         rclcpp::FutureReturnCode::SUCCESS)
       {
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Results: %d", result.get()->status);
@@ -791,24 +795,24 @@ void MTCPlanner::gripper_open(){
 
 void MTCPlanner::gripper_close(){
 
-  if(!if_simulation_){
+  if(!this->if_simulation_){
 
     auto request = std::make_shared<custom_msgs::srv::GripperCmd::Request>();
 
     request->grip = 10 ;
     request->cmd = 'C' ;
 
-    while (!MTCPlanner::client_->wait_for_service(1s)) {
+    while (!this->client_->wait_for_service(1s)) {
       if (!rclcpp::ok()) {
         RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
       }
       RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
     }
 
-    auto result = MTCPlanner::client_->async_send_request(request);
+    auto result = this->client_->async_send_request(request);
 
     // Wait for the result.
-    if (rclcpp::spin_until_future_complete(node_, result) ==
+    if (rclcpp::spin_until_future_complete(this->node_, result) ==
       rclcpp::FutureReturnCode::SUCCESS)
     {
       RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Results: %d", result.get()->status);
@@ -825,7 +829,7 @@ void MTCPlanner::gripper_close(){
 void MTCPlanner::gripper_activate(){
 
 
-  if(!if_simulation_){
+  if(!this->if_simulation_){
     auto request = std::make_shared<custom_msgs::srv::GripperCmd::Request>();
 
     request->grip = 10 ;
@@ -838,10 +842,10 @@ void MTCPlanner::gripper_activate(){
       RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
     }
 
-    auto result = client_->async_send_request(request);
+    auto result = this->client_->async_send_request(request);
 
     // Wait for the result.
-    if (rclcpp::spin_until_future_complete(node_, result) ==
+    if (rclcpp::spin_until_future_complete(this->node_, result) ==
       rclcpp::FutureReturnCode::SUCCESS)
     {
       RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Results: %d", result.get()->status);
@@ -864,3 +868,4 @@ void MTCPlanner::pretty_logger(std::string text){
   RCLCPP_INFO(LOGGER, "******************************************************");  
 
 }
+

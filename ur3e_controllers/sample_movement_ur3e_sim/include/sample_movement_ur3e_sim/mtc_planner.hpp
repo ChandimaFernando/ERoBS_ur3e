@@ -96,6 +96,7 @@ class MTCPlanner
         std::vector<double> pre_place_approach_angles ;
         std::vector<double> pre_return_place_approach_angles ;
         std::vector<double> out_of_jail_angles ;
+        std::vector<double> pre_return_place_adjustment_angles ;
 
         double over_arm_stages_ ;
         double under_arm_stages_ ;

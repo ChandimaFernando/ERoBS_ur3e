@@ -10,7 +10,6 @@ from ur_moveit_config.launch_common import load_yaml
 from launch_ros.descriptions import ParameterValue
 from ament_index_python.packages import get_package_share_directory
 
-
 import pdb
 
 
