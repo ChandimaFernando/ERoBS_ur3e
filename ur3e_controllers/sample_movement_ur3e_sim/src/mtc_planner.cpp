@@ -247,11 +247,23 @@ void MTCPlanner::approach_object(std::string task_name, std::string obj_to_pick)
 
     oc.absolute_x_axis_tolerance = this->axis_tolarance_ ;
     oc.absolute_y_axis_tolerance = this->axis_tolarance_ ;
+    oc.absolute_z_axis_tolerance = this->axis_tolarance_ ;
 
     oc.orientation.w = eef_pose.pose.orientation.w ;
     oc.orientation.x = eef_pose.pose.orientation.x ;
     oc.orientation.y = eef_pose.pose.orientation.y ;
     oc.orientation.z = eef_pose.pose.orientation.z;
+
+ RCLCPP_INFO(LOGGER, "eef_pose.pose.orientation.w : %f", eef_pose.pose.orientation.w );  
+ RCLCPP_INFO(LOGGER, "eef_pose.pose.orientation.x : %f", eef_pose.pose.orientation.x );  
+ RCLCPP_INFO(LOGGER, "eef_pose.pose.orientation.y : %f", eef_pose.pose.orientation.y );  
+ RCLCPP_INFO(LOGGER, "eef_pose.pose.orientation.z : %f", eef_pose.pose.orientation.z );  
+
+ RCLCPP_INFO(LOGGER, "intrm_pose.pose.orientation.w : %f", intrm_pose.orientation.w );  
+ RCLCPP_INFO(LOGGER, "intrm_pose.pose.orientation.x : %f", intrm_pose.orientation.x);  
+ RCLCPP_INFO(LOGGER, "intrm_pose.pose.orientation.y : %f", intrm_pose.orientation.y);  
+ RCLCPP_INFO(LOGGER, "intrm_pose.pose.orientation.z : %f", intrm_pose.orientation.z );  
+
 
    // Execute the cartesian trajectory to adjust z first
     moveit_msgs::msg::RobotTrajectory trajectory;
@@ -302,6 +314,8 @@ void MTCPlanner::retreat_object(std::string task_name, bool with_sample_attached
 
     oc.absolute_x_axis_tolerance = this->axis_tolarance_ ;
     oc.absolute_y_axis_tolerance = this->axis_tolarance_ ;
+    oc.absolute_z_axis_tolerance = this->axis_tolarance_ ;
+
 
     oc.orientation.w = eef_pose.pose.orientation.w ;
     oc.orientation.x = eef_pose.pose.orientation.x ;
@@ -361,11 +375,12 @@ void MTCPlanner::move_vertically(std::string task_name, std::string target)
 
   oc.absolute_x_axis_tolerance = this->axis_tolarance_ ;
   oc.absolute_y_axis_tolerance = this->axis_tolarance_ ;
+  oc.absolute_z_axis_tolerance = this->axis_tolarance_ ;
 
   oc.orientation.w = eef_pose.pose.orientation.w ;
   oc.orientation.x = eef_pose.pose.orientation.x ;
   oc.orientation.y = eef_pose.pose.orientation.y ;
-  oc.orientation.z = eef_pose.pose.orientation.z;
+  oc.orientation.z = eef_pose.pose.orientation.z; 
 
   // Execute the cartesian trajectory to adjust z first
   moveit_msgs::msg::RobotTrajectory trajectory;
@@ -409,7 +424,7 @@ void MTCPlanner::pick_up(std::string obj_to_pick, std::string target_location){
     switch (pick_up_enum_value)
     {
       case pick_up_enum::REST:
-        if(!arm_at_rest){
+        // if(!this->arm_at_rest){
           this->pretty_logger("Execuitng: pick_up_enum::REST");
           this->gripper_open();
           completed_stages_++ ;
@@ -419,8 +434,8 @@ void MTCPlanner::pick_up(std::string obj_to_pick, std::string target_location){
 
           completed_stages_++ ;
           rclcpp::sleep_for(sleep_time);
-          arm_at_rest = true ;
-        }
+          this->arm_at_rest = true ;
+        // }
         
         // pick_overarm_enum_value = pick_overarm::OVERARM_PICK;
         break;
@@ -487,7 +502,7 @@ void MTCPlanner::place(std::string obj_to_pick, std::string target_location){
         completed_stages_++ ;
         this->task_executor();
         rclcpp::sleep_for(sleep_time);
-        arm_at_rest = true ;
+        // arm_at_rest = true ;
         
         // pick_overarm_enum_value = pick_overarm::OVERARM_PICK;
         break;
@@ -515,6 +530,7 @@ void MTCPlanner::place(std::string obj_to_pick, std::string target_location){
         this->task_executor();
         completed_stages_++ ;
         rclcpp::sleep_for(sleep_time);
+        this->arm_at_rest = true ;
 
         break ;
 
@@ -551,7 +567,7 @@ void MTCPlanner::return_pickup(std::string obj_to_pick, std::string target_locat
         completed_stages_++ ;
         this->task_executor();
         rclcpp::sleep_for(sleep_time);
-        arm_at_rest = true ;
+        // arm_at_rest = true ;
         
         // pick_overarm_enum_value = pick_overarm::OVERARM_PICK;
         break;

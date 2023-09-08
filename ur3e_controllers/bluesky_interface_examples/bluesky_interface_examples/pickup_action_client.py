@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.action import ActionClient
 from rclpy.node import Node
+import time
 
 from custom_msgs.action import PickPlace
 # from action_tutorials_interfaces.action import Fibonacci
@@ -20,7 +21,10 @@ class PickPlaceActionClient(Node):
 
         self._action_client.wait_for_server()
 
+        # return self._action_client.send_goal(goal_msg)
+
         return self._action_client.send_goal_async(goal_msg)
+
 
 
 def main(args=None):
@@ -30,10 +34,19 @@ def main(args=None):
 
     # future = action_client.send_goal(storage name, inbeam name, task name)
     # Check the 4 example calls below
-    # future = action_client.send_goal('holder_shaft_storage', 'holder_shaft_inbeam', "PICK_UP")
-    future = action_client.send_goal('holder_shaft_storage', 'holder_shaft_inbeam', "PLACE")
-    # future = action_client.send_goal('holder_shaft_inbeam', 'holder_shaft_storage', "RETURN_PICK_UP")
-    # future = action_client.send_goal('holder_shaft_inbeam', 'holder_shaft_storage', "RETURN_PLACE")
+
+    # while not future.done() :
+    #     print("process is executing")
+    #     time.sleep(10.0)
+
+    # print(" ******* process finished ****** ")
+
+    # future = action_client.send_goal('holder_shaft_storage', 'holder_shaft_inbeam', "PLACE")
+
+    # future = action_client.send_goal("holder_shaft_storage", "holder_shaft_inbeam", "PICK_UP")
+    # future = action_client.send_goal("holder_shaft_storage", "holder_shaft_inbeam", "PLACE")
+    # future = action_client.send_goal("holder_shaft_inbeam", "holder_shaft_storage", "RETURN_PICK_UP")
+    future = action_client.send_goal("holder_shaft_inbeam", "holder_shaft_storage", "RETURN_PLACE")
 
     rclpy.spin_until_future_complete(action_client, future)
 

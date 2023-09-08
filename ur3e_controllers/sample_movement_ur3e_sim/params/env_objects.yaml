@@ -38,7 +38,7 @@ ur_task_manager:
         #w: 0.0 # pose, orientation 
         x: 0.006 # pose x
         y: 0.56 # pose y
-        z: 0.475 # pose z 
+        z: 10.475 # pose z 
       holder_shaft_inbeam:  #holder_shaft_inbeam
         type: 'BOX'
         w: 0.02 # width
@@ -46,7 +46,7 @@ ur_task_manager:
         h: 0.04 # height
         #w: 0.0 # pose, orientation 
         x: 0.006 # pose x
-        y: 0.55 # pose y
+        y: 0.525 # pose y
         z: 0.40 # pose z 
       holder_head_inbeam:
         type: 'BOX'
@@ -73,7 +73,7 @@ ur_task_manager:
         h: 0.04 # height
         #w: 0.0 # pose, orientation 
         x: -0.044 # pose x
-        y: -0.51 # pose y
+        y: -0.53 #-0.51 # pose y
         z: 0.06 # pose z 
       holder_head_storage:
         type: 'BOX'
@@ -88,7 +88,11 @@ ur_task_manager:
     under_arm_stages: 19.0
     ur3e:
       joint_names: ['shoulder_pan_joint' , 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
-      rest_angles: [0.0, -1.5708, 0.0, -1.5708, 0.0, 0.0] #For real robot
+      # rest_angles: [0.0, -1.5708, 0.0, -1.5708, 0.0, 0.0] #For real robot with singularity
+      # rest_angles: [-0.11536, -1.783732, 0.38816, -1.75492, 0.11484, 3.14159] #For real robot
+      rest_angles: [-0.11536, -1.783732, 0.38816, -1.75492, 0.11484, 3.14159] #For real robot
+
+
       # Pick_up task
       pre_approach: [0.0, -2.2230397, -2.4030528 , -1.627018 , -1.541525, 3.141435] 
       pre_approach_stg_2: [-4.251453 , -2.2230678 , -2.4030139 , -1.6269628 , -1.0731676, 3.1413669] # This is the base turn 
@@ -108,5 +112,5 @@ ur_task_manager:
       finger_offset_x: 0.0
       finger_offset_y: 0.01
       finger_offset_z: 0.01
-      axis_tolarance: 0.1
+      axis_tolarance: 5.0 # 0.1 defuat
       simulation: false
