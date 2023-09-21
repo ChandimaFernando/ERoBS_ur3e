@@ -4,3 +4,4 @@ ERoBS_ur3e_AC_basic.code-workspace
 external_dependencies/moveit2
 external_dependencies/moveit_task_constructor
 
+external_dependencies/moveit2
