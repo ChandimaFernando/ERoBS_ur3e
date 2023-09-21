@@ -17,11 +17,11 @@ repositories:
     type: git
     url: https://github.com/ros-planning/moveit_task_constructor.git
     version: 564804bd7bb9e320b304b8c4880d96c6ce63b915
-  moveit_visual_tools:
-    type: git
-    url: https://github.com/ros-planning/moveit_visual_tools
-    VERSION: 85784336be6661b199a78a095c59019561e01530
-#    version: 4.1.0
+#  moveit_visual_tools:
+#    type: git
+#    url: https://github.com/ros-planning/moveit_visual_tools
+#    VERSION: 85784336be6661b199a78a095c59019561e01530
+##    version: 4.1.0
   rosparam_shortcuts:
     type: git
     url: https://github.com/PickNikRobotics/rosparam_shortcuts
@@ -30,10 +30,10 @@ repositories:
     type: git
     url: https://github.com/ros-planning/srdfdom.git
     version: 2.0.4
-  Universal_Robots_ROS2_Driver:
-    type: git
-    url: https://github.com/UniversalRobots/Universal_Robots_ROS2_Driver.git
-    version: 2.2.6
+#  Universal_Robots_ROS2_Driver:
+#    type: git
+#    url: https://github.com/UniversalRobots/Universal_Robots_ROS2_Driver.git
+#    version: 2.2.6
   Universal_Robots_Client_Library:
     type: git
     url: https://github.com/UniversalRobots/Universal_Robots_Client_Library.git
